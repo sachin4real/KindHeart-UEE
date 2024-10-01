@@ -1,27 +1,39 @@
-import { View, Text, Image } from 'react-native'
-import React from 'react'
-import { Colors } from '../constants/Colors'
-import { TouchableOpacity } from 'react-native'
+import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import React from 'react';
 
-export default function CategoryItem({category,onCategoryPress}) {
+// Get device width
+const windowWidth = Dimensions.get('window').width;
+
+export default function CategoryItem({ category, onCategoryPress }) {
   return (
-    <TouchableOpacity onPress={() => onCategoryPress(category)}>
-        <View style={{padding:10,
-            
-            borderRadius:99,
-            marginRight:15
-        }}>
-      <Image source={{uri:category.icon}}
-      style={{width:40,
-        height:40}}
-      />
+    <TouchableOpacity onPress={() => onCategoryPress(category)} style={styles.categoryItem}>
+      <View style={styles.iconContainer}>
+        <Image source={{ uri: category.icon }} style={styles.icon} />
       </View>
-      <Text style={{
-        fontSize:12,
-        fontFamily:'outfit-medium',
-        textAlign:'center',
-        marginTop:5
-      }}>{category.name}</Text>
+      <Text style={styles.categoryText}>{category.name}</Text>
     </TouchableOpacity>
-  )
+  );
 }
+
+const styles = StyleSheet.create({
+  categoryItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: windowWidth / 20, // Space between items
+  },
+  iconContainer: {
+    backgroundColor: '#B7E0FF', // Icon background color
+    borderRadius: 50,
+    padding: 10,
+    marginBottom: 5,
+  },
+  icon: {
+    width: 50,
+    height: 50,
+  },
+  categoryText: {
+    fontSize: 12,
+    fontFamily: 'outfit-medium',
+    textAlign: 'center',
+  },
+});

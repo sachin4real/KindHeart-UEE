@@ -1,51 +1,63 @@
-import { View, Text } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { collection, getDocs, query } from 'firebase/firestore'
-import { db } from '../../configs/FirebaseConfig'
-import { FlatList } from 'react-native';
-import CategoryItem from '../CategoryItem';
+import { View, FlatList, StyleSheet, Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { collection, getDocs, query } from 'firebase/firestore';
+import { db } from '../../configs/FirebaseConfig';
+import CategoryItem from '../CategoryItem'
 
-export default function category() {
+// Get device width
+const windowWidth = Dimensions.get('window').width;
 
-    const[categoryList,setCategoryList]=useState([]);
-    useEffect(()=>{
-        GetcategoryList()
-    },[])
-    const GetcategoryList=async()=>{
-        setCategoryList([])
-        const q=query(collection(db,'Category'));
-        const querySnapshot=await getDocs(q);
+export default function Category({ onCategorySelect }) {
+  const [categoryList, setCategoryList] = useState([]);
 
-        querySnapshot.forEach((doc)=>{
-            console.log(doc.data())
-            setCategoryList(prev=>[...prev,doc.data()])
-        })
-    }
+  useEffect(() => {
+    GetCategoryList();
+  }, []);
+
+  const GetCategoryList = async () => {
+    const q = query(collection(db, 'Category'));
+    const querySnapshot = await getDocs(q);
+    const fetchedCategories = [];
+
+    querySnapshot.forEach((doc) => {
+      fetchedCategories.push(doc.data());
+    });
+
+    // Ensure 'All' comes first
+    const sortedCategories = fetchedCategories.sort((a, b) =>
+      a.name === 'All' ? -1 : b.name === 'All' ? 1 : 0
+    );
+
+    setCategoryList(sortedCategories);
+  };
+
+  const renderCategoryItem = ({ item }) => (
+    <CategoryItem category={item} onCategoryPress={onCategorySelect} />
+  );
+
   return (
-    <View>
-      <Text
-      style={{paddingLeft:20,
-        marginTop:10,
-        fontSize:20,
-        fontFamily:'outfit-medium',
-        display:'flex'
-      }}
-      
-      >categories</Text>
+    <View style={styles.container}>
       <FlatList
         data={categoryList}
-        horizontal={true}
-        renderItem={({item,index})=>(
-            <CategoryItem category={item}
-             key={index}
-             onCategoryPress={(category)=>console.log(category)}
-             />
-
-        )}
-           
-      
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        renderItem={renderCategoryItem}
+        keyExtractor={(item, index) => index.toString()}
+        contentContainerStyle={styles.flatListContainer}
+        snapToAlignment="start"
+        decelerationRate="fast"
+        snapToInterval={windowWidth / 4} // Ensures scrolling fits 4 categories
       />
-        
     </View>
-  )
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 10,
+  },
+  flatListContainer: {
+    paddingLeft: 20,
+    paddingRight: 20,
+  },
+});
