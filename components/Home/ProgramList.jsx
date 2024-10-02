@@ -39,6 +39,9 @@ export default function ProgramList({ selectedCategory }) {
         renderItem={({ item, index }) => (
           <ProgramListCard key={index} program={item} />
         )}
+        keyExtractor={(item, index) => index.toString()}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContent} // This style will ensure proper padding
       />
     </View>
   );
@@ -46,6 +49,7 @@ export default function ProgramList({ selectedCategory }) {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1, // Make sure the container takes full available height
     paddingVertical: 20,
     backgroundColor: '#f9f9f9',
   },
@@ -54,5 +58,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: 'outfit-medium',
     marginBottom: 10,
+  },
+  listContent: {
+    paddingBottom: 50, // Add bottom padding to ensure scrolling feels smooth
   },
 });
