@@ -22,3 +22,4 @@ expo-env.d.ts
 # Ignore environment variable files
 .env
 .env.*
+/configs/FirebaseConfig.js
