@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router'; // Add useRouter
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../configs/FirebaseConfig';
+import { Ionicons } from '@expo/vector-icons'; // For the back button icon
 
 export default function Payment() {
   const { paymentID } = useLocalSearchParams();
@@ -52,56 +53,64 @@ export default function Payment() {
       keyboardVerticalOffset={80}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Program Image */}
-        <Image source={{ uri: program.imageUrl }} style={styles.image} />
+        {/* Program Image Section with Back Button */}
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: program.imageUrl }} style={styles.image} />
+          <View style={styles.imageOverlay} />
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
 
         {/* Program Title */}
-        <Text style={styles.headerText}>{program.name}</Text>
+        <View style={styles.contentWrapper}>
+          <Text style={styles.headerText}>{program.name}</Text>
 
-        {/* Donation Progress */}
-        <Text style={styles.donationText}>{`$${program.donatedAmount} / $${program.goalAmount}`}</Text>
+          {/* Donation Progress */}
+          <Text style={styles.donationText}>{`$${program.donatedAmount} / $${program.goalAmount}`}</Text>
 
-        {/* Progress Bar */}
-        <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: `${donationPercentage}%` }]} />
+          {/* Progress Bar */}
+          <View style={styles.progressBar}>
+            <View style={[styles.progressFill, { width: `${donationPercentage}%` }]} />
+          </View>
+
+          {/* Predefined Donation Amounts */}
+          <Text style={styles.label}>Donation Amount</Text>
+          <View style={styles.predefinedAmounts}>
+            {['5.00', '15.00', '25.00'].map((amount) => (
+              <TouchableOpacity
+                key={amount}
+                style={[
+                  styles.amountButton,
+                  predefinedAmount === amount && styles.amountButtonSelected,
+                ]}
+                onPress={() => setPredefinedAmount(amount)}
+              >
+                <Text style={[styles.amountText, predefinedAmount === amount && styles.amountTextSelected]}>
+                  ${amount}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Custom Donation Amount Input */}
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your donation amount"
+            keyboardType="numeric"
+            value={donationAmount}
+            onChangeText={(value) => setDonationAmount(value)}
+            returnKeyType="done" // Adds a "Done" button on the keyboard
+            onSubmitEditing={handleDonate} // Trigger donation when done is pressed
+          />
+
+          {/* Donate Button */}
+          <TouchableOpacity onPress={handleDonate} style={styles.donateButton}>
+            <Text style={styles.donateButtonText}>
+              Donate Rs{donationAmount || predefinedAmount}
+            </Text>
+          </TouchableOpacity>
         </View>
-
-        {/* Predefined Donation Amounts */}
-        <Text style={styles.label}>Donation Amount</Text>
-        <View style={styles.predefinedAmounts}>
-          {['5.00', '15.00', '25.00'].map((amount) => (
-            <TouchableOpacity
-              key={amount}
-              style={[
-                styles.amountButton,
-                predefinedAmount === amount && styles.amountButtonSelected,
-              ]}
-              onPress={() => setPredefinedAmount(amount)}
-            >
-              <Text style={[styles.amountText, predefinedAmount === amount && styles.amountTextSelected]}>
-                ${amount}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Custom Donation Amount Input */}
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your donation amount"
-          keyboardType="numeric"
-          value={donationAmount}
-          onChangeText={(value) => setDonationAmount(value)}
-          returnKeyType="done" // Adds a "Done" button on the keyboard
-          onSubmitEditing={handleDonate} // Trigger donation when done is pressed
-        />
-
-        {/* Donate Button */}
-        <TouchableOpacity onPress={handleDonate} style={styles.donateButton}>
-          <Text style={styles.donateButtonText}>
-            Donate ${donationAmount || predefinedAmount}
-          </Text>
-        </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -113,24 +122,52 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   scrollContainer: {
-    padding: 20,
+    flexGrow: 1,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  imageContainer: {
+    width: '100%',
+    height: 300,
+    position: 'relative',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    overflow: 'hidden',
+  },
   image: {
     width: '100%',
-    height: 250,
-    borderRadius: 20,
-    marginBottom: 20,
-    opacity: 0.9,
+    height: '100%',
+  },
+  imageOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Darker overlay for text visibility
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 10,
+    borderRadius: 50,
+    zIndex: 2,
+  },
+  contentWrapper: {
+    padding: 20,
   },
   headerText: {
     fontSize: 24,
     fontFamily: 'outfit-medium',
-    marginBottom: 20,
+    marginBottom: 10,
+    marginTop: 10,
   },
   donationText: {
     fontFamily: 'outfit',
@@ -160,10 +197,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   amountButton: {
-    padding: 10,
+    padding: 12,
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 5,
+    borderRadius: 8,
     width: '30%',
     alignItems: 'center',
   },
@@ -181,16 +218,17 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 5,
+    padding: 12,
+    borderRadius: 8,
     fontSize: 16,
     marginBottom: 20,
   },
   donateButton: {
     backgroundColor: '#E74C3C',
-    padding: 15,
-    borderRadius: 10,
+    padding: 18,
+    borderRadius: 12,
     alignItems: 'center',
+    marginTop: 10,
   },
   donateButtonText: {
     color: '#fff',
