@@ -1,12 +1,17 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
 import React from 'react';
+import { TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 
 export default function ProgramListCard({ program }) {
+  const router=useRouter();
   // Calculate donation percentage
   const donationPercentage = (program.donatedAmount / program.goalAmount) * 100;
 
   return (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card}
+      onPress={()=>router.push('/programDetails/'+program.id)}
+    >
       <Image
         source={{ uri: program.imageUrl }}
         style={styles.image}
@@ -23,7 +28,7 @@ export default function ProgramListCard({ program }) {
           {donationPercentage.toFixed(2)}% of goal achieved
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -57,7 +62,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   donationText: {
-    fontFamily: 'outfit-regular',
+    fontFamily: 'outfit',
     fontSize: 14,
     marginBottom: 5,
   },
@@ -74,7 +79,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   percentageText: {
-    fontFamily: 'outfit-regular',
+    fontFamily: 'outfit',
     fontSize: 12,
   },
 });

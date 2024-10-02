@@ -6,50 +6,62 @@ import ProgramListCard from './ProgramListCard';
 
 export default function ProgramList({ selectedCategory }) {
   const [programList, setProgramList] = useState([]);
+  const [loading, setLoading] = useState(true);  // To manage the loading state
 
   useEffect(() => {
     GetProgramList();
-  }, [selectedCategory]); // Fetch programs whenever the selected category changes
+  }, [selectedCategory]); // Re-run whenever selectedCategory changes
 
+  // Function to fetch programs from Firestore based on category
   const GetProgramList = async () => {
-    setProgramList([]); // Clear current list
+    setLoading(true); // Start loading before fetching data
+    try {
+      let q;
+      if (selectedCategory === 'All') {
+        q = query(collection(db, 'ProgramList')); // Fetch all programs if 'All' is selected
+      } else {
+        q = query(collection(db, 'ProgramList'), where('category', '==', selectedCategory)); // Fetch programs by category
+      }
 
-    let q;
-    if (selectedCategory === 'All') {
-      // Fetch all programs if 'All' is selected
-      q = query(collection(db, 'ProgramList'));
-    } else {
-      // Fetch programs based on the selected category
-      q = query(collection(db, 'ProgramList'), where('category', '==', selectedCategory));
+      const querySnapshot = await getDocs(q);
+      const fetchedPrograms = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setProgramList(fetchedPrograms); // Set the fetched programs to state
+    } catch (error) {
+      console.error("Error fetching programs: ", error); // Handle any error
+    } finally {
+      setLoading(false); // Stop loading once data is fetched
     }
-
-    const querySnapshot = await getDocs(q);
-    const fetchedPrograms = [];
-    querySnapshot.forEach((doc) => {
-      fetchedPrograms.push(doc.data());
-    });
-    setProgramList(fetchedPrograms);
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Trending Programs</Text>
-      <FlatList
-        data={programList}
-        renderItem={({ item, index }) => (
-          <ProgramListCard key={index} program={item} />
-        )}
-        keyExtractor={(item, index) => index.toString()}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContent} // This style will ensure proper padding
-      />
+      
+      {/* Show loading indicator if data is still being fetched */}
+      {loading ? (
+        <Text style={styles.loadingText}>Loading...</Text>
+      ) : (
+        <FlatList
+          data={programList}
+          renderItem={({ item }) => (
+            <ProgramListCard key={item.id} program={item} />  // Render each program card
+          )}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
+        />
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // Make sure the container takes full available height
+    flex: 1, // Ensure the container takes the full available height
     paddingVertical: 20,
     backgroundColor: '#f9f9f9',
   },
@@ -60,6 +72,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   listContent: {
-    paddingBottom: 50, // Add bottom padding to ensure scrolling feels smooth
+    paddingBottom: 50, // Add bottom padding for smooth scrolling experience
+  },
+  loadingText: {
+    textAlign: 'center',
+    marginTop: 20,
+    fontSize: 16,
+    fontFamily: 'outfit-medium',
   },
 });
