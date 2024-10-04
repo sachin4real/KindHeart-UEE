@@ -1,5 +1,6 @@
 import { View, Text } from 'react-native'
 import React from 'react'
+import Userintro from '../../components/Profile/Userintro'
 
 export default function profile() {
   return (
@@ -7,10 +8,10 @@ export default function profile() {
     <View style={{
       padding:20
     }}>
-      <Text style={{
-        fontFamily:'outfit-bold',
-        fontSize:35
-      }}>profile</Text>
+      
+
+      <Userintro/>
+
     </View>
   )
 }

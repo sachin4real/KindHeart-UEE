@@ -1,13 +1,92 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import React from 'react';
-import { useLocalSearchParams } from 'expo-router';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { doc, getDoc, setDoc, updateDoc, increment, arrayUnion } from 'firebase/firestore'; // Firestore imports
+import { db } from '../configs/FirebaseConfig';
+import { useUser } from '@clerk/clerk-expo'; // Import Clerk's useUser hook
+import * as Animatable from 'react-native-animatable'; // For simple animations
 
 export default function PaymentDetails() {
   const { amount, programID } = useLocalSearchParams(); // Get donation amount and programID from params
+  const router = useRouter();
+  
+  // Use Clerk's useUser hook to get the authenticated user
+  const { user } = useUser();
 
-  const handlePayment = () => {
-    alert(`Processing payment of $${amount} for Program ID: ${programID}`);
-    // Here you can integrate with your payment API (e.g., Stripe, PayPal, etc.)
+  // State to hold card details
+  const [cardName, setCardName] = useState('');
+  const [cardNumber, setCardNumber] = useState('');
+  const [expirationDate, setExpirationDate] = useState('');
+  const [cvc, setCvc] = useState('');
+
+  // Handle Payment Function
+  const handlePayment = async () => {
+    try {
+      const userID = user?.id; // Fetch the authenticated user's ID from Clerk
+
+      // Fetch the program name from Firestore using the programID
+      const programDocRef = doc(db, 'ProgramList', programID);
+      const programDocSnap = await getDoc(programDocRef);
+
+      if (!programDocSnap.exists()) {
+        throw new Error('Program not found');
+      }
+
+      const programData = programDocSnap.data();
+      const programName = programData?.name;
+
+      // Fetch the user's document
+      const userDocRef = doc(db, 'Users', userID);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        // If user exists, update their donation amount and programs
+        const userData = userDocSnap.data();
+        const existingPrograms = userData.donatedPrograms || [];
+        const existingProgram = existingPrograms.find(p => p.programName === programName);
+
+        if (existingProgram) {
+          // If the user already donated to this program, update the donation amount
+          await updateDoc(userDocRef, {
+            donatedPrograms: existingPrograms.map(p =>
+              p.programName === programName
+                ? { programName: p.programName, amountDonated: p.amountDonated + Number(amount) }
+                : p
+            ),
+            totalDonations: increment(Number(amount)), // Update the total donations
+          });
+        } else {
+          // If the user hasn't donated to this program before, add a new entry
+          await updateDoc(userDocRef, {
+            donatedPrograms: arrayUnion({ programName, amountDonated: Number(amount) }), // Add new donation for the program
+            totalDonations: increment(Number(amount)), // Update the total donations
+          });
+        }
+      } else {
+        // Create a new user document with initial donation data and add the first donated program
+        await setDoc(userDocRef, {
+          totalDonations: Number(amount),
+          achievements: [],
+          donatedPrograms: [{ programName, amountDonated: Number(amount) }], // Initialize with the current program and amount
+        });
+      }
+
+      // Update the donatedAmount in the ProgramList
+      await updateDoc(programDocRef, {
+        donatedAmount: increment(Number(amount)),
+      });
+
+      // Show success alert
+      Alert.alert(
+        'Thank You!',
+        `Your donation of $${amount} was successful to ${programName}.`,
+        [{ text: 'OK', onPress: () => router.push('/thankYou') }]
+      );
+
+    } catch (error) {
+      console.error('Error processing payment: ', error);
+      Alert.alert('Payment failed', 'Please try again.');
+    }
   };
 
   return (
@@ -25,19 +104,44 @@ export default function PaymentDetails() {
         </TouchableOpacity>
       </View>
 
-      {/* Mock Card UI */}
-      <Image source={{ uri: 'https://example.com/card_image.png' }} style={styles.cardImage} />
+      {/* Animated Card Details Form */}
+      <Animatable.View animation="fadeInUp" delay={200} style={styles.formContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Cardholder Name"
+          value={cardName}
+          onChangeText={setCardName}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Card Number"
+          value={cardNumber}
+          onChangeText={setCardNumber}
+          keyboardType="numeric"
+        />
+        <View style={styles.row}>
+          <TextInput
+            style={[styles.input, styles.smallInput]}
+            placeholder="Expiration Date (MM/YY)"
+            value={expirationDate}
+            onChangeText={setExpirationDate}
+          />
+          <TextInput
+            style={[styles.input, styles.smallInput]}
+            placeholder="CVC"
+            value={cvc}
+            onChangeText={setCvc}
+            keyboardType="numeric"
+          />
+        </View>
+      </Animatable.View>
 
-      {/* Payment Info */}
-      <Text style={styles.infoText}>Cardholder Name: John Doe</Text>
-      <Text style={styles.infoText}>Card Number: 0000 0000 0000 0000</Text>
-      <Text style={styles.infoText}>Expiration Date: 00/00</Text>
-      <Text style={styles.infoText}>CVC: ***</Text>
-
-      {/* Donate Now Button */}
-      <TouchableOpacity style={styles.donateButton} onPress={handlePayment}>
-        <Text style={styles.donateButtonText}>Donate ${amount}</Text>
-      </TouchableOpacity>
+      {/* Donate Now Button with animation */}
+      <Animatable.View animation="pulse" iterationCount="infinite">
+        <TouchableOpacity style={styles.donateButton} onPress={handlePayment}>
+          <Text style={styles.donateButtonText}>Donate ${amount}</Text>
+        </TouchableOpacity>
+      </Animatable.View>
     </View>
   );
 }
@@ -59,14 +163,24 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
   },
-  cardImage: {
-    width: '100%',
-    height: 150,
+  formContainer: {
     marginBottom: 20,
   },
-  infoText: {
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 15,
     fontSize: 16,
-    marginBottom: 10,
+    width: '100%',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  smallInput: {
+    width: '48%',
   },
   donateButton: {
     backgroundColor: '#E74C3C',
