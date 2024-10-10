@@ -19,7 +19,7 @@ export default function ProgramListCard({ program }) {
       <View style={styles.textContainer}>
         <Text style={styles.programName}>{program.name}</Text>
         <Text style={styles.donationText}>
-          {`$${program.donatedAmount} / $${program.goalAmount}`}
+          {`Rs${program.donatedAmount} / Rs${program.goalAmount}`}
         </Text>
         <View style={styles.progressBar}>
           <View style={[styles.progressFill, { width: `${donationPercentage}%` }]} />
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#0a7ea4',
+    backgroundColor: '#738FFE',
     borderRadius: 5,
   },
   percentageText: {
