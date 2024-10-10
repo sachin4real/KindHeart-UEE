@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     marginHorizontal: windowWidth / 20, // Space between items
   },
   iconContainer: {
-    backgroundColor: '#B7E0FF', // Icon background color
+    backgroundColor: '#738FFE', // Icon background color
     borderRadius: 50,
     padding: 10,
     marginBottom: 5,
