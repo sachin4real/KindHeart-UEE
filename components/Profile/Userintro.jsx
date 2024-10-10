@@ -1,24 +1,21 @@
-// app/profile/Userintro.jsx
-
-import { View, Text, Image, StyleSheet, ActivityIndicator, FlatList, TouchableOpacity, ProgressBarAndroid } from 'react-native';
+import { View, Text, Image, StyleSheet, ActivityIndicator, FlatList, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-expo';
-import { Ionicons } from '@expo/vector-icons'; // For icons
-import { doc, getDoc } from 'firebase/firestore'; // Firestore imports
+import { Ionicons } from '@expo/vector-icons';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../configs/FirebaseConfig';
-import { useRouter } from 'expo-router'; // Import useRouter
+import { useRouter } from 'expo-router';
 
 export default function Userintro() {
-  const { user } = useUser(); // Clerk user
-  const [donations, setDonations] = useState(0); // Initialize donations
-  const [programsContributed, setProgramsContributed] = useState([]); // Programs user donated to
+  const { user } = useUser();
+  const [donations, setDonations] = useState(0);
+  const [programsContributed, setProgramsContributed] = useState([]);
   const [achievements, setAchievements] = useState(null);
-  const [nextAchievement, setNextAchievement] = useState(50000); // Default next achievement goal
-  const [progress, setProgress] = useState(0); // Progress towards next achievement
-  const [loading, setLoading] = useState(true); // Loading state
-  const router = useRouter(); // Initialize the router
-  
-  // Fetch user donations and program data from Firestore
+  const [nextAchievement, setNextAchievement] = useState(50000);
+  const [progress, setProgress] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
   useEffect(() => {
     if (user?.id) {
       fetchUserData(user.id);
@@ -36,9 +33,8 @@ export default function Userintro() {
 
         setDonations(totalDonations);
 
-        // Use the donatedPrograms field directly, which contains both program names and amounts
         if (userData.donatedPrograms && userData.donatedPrograms.length > 0) {
-          setProgramsContributed(userData.donatedPrograms); // Set program names and amounts
+          setProgramsContributed(userData.donatedPrograms);
         }
 
         calculateAchievements(totalDonations);
@@ -48,45 +44,42 @@ export default function Userintro() {
     } catch (error) {
       console.error('Error fetching user data:', error);
     } finally {
-      setLoading(false); // End loading when data is fetched
+      setLoading(false);
     }
   };
 
   const calculateAchievements = (totalDonations) => {
     let achievement = null;
-    let next = 50000; // Default for the gold medal
+    let next = 50000;
 
-    if (totalDonations >= 50000) {
+    if (totalDonations >= 1000000) {
       achievement = 'gold';
-      next = 100000; // Next achievement goal could be customized
-    } else if (totalDonations >= 25000) {
+      next = 1000000;
+    } else if (totalDonations >= 500000) {
       achievement = 'silver';
-      next = 50000;
-    } else if (totalDonations >= 10000) {
+      next = 1000000;
+    } else if (totalDonations >= 100000) {
       achievement = 'bronze';
-      next = 25000;
+      next = 500000;
     }
 
     setAchievements(achievement);
     setNextAchievement(next);
-    setProgress(totalDonations / next); // Progress is a ratio of totalDonations to next target
+    setProgress((totalDonations / next) * 100); // Progress as a percentage
   };
 
-  // Loading indicator
   if (loading) {
     return <ActivityIndicator size="large" style={{ marginTop: 50 }} />;
   }
 
-  return (
-    <View style={styles.container}>
-      {/* User Profile */}
+  const renderHeader = () => (
+    <View style={styles.headerContainer}>
       {user?.imageUrl ? (
         <Image source={{ uri: user.imageUrl }} style={styles.profileImage} />
       ) : (
         <Text style={styles.fallbackText}>No Image Available</Text>
       )}
 
-      {/* Achievement Section */}
       {achievements && (
         <View style={styles.achievementContainer}>
           <Text style={styles.congratsText}>Congratulations 🎉 {user?.fullName || 'User'}!</Text>
@@ -98,12 +91,11 @@ export default function Userintro() {
             style={styles.medalIcon}
           />
           <Text style={styles.donationsText}>
-            <Text style={styles.highlight}>${donations.toLocaleString()} Donations!</Text>
+            <Text style={styles.highlight}>Rs{donations.toLocaleString()} Donations!</Text>
           </Text>
         </View>
       )}
 
-      {/* Stats Section */}
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
           <Text style={styles.statValue}>{programsContributed.length}</Text>
@@ -111,59 +103,60 @@ export default function Userintro() {
         </View>
       </View>
 
-      {/* Progress Bar towards next achievement */}
       <View style={styles.impactContainer}>
         <Text style={styles.impactTitle}>Your Impact</Text>
         <Text style={styles.progressText}>
-          Next Achievement: ${(nextAchievement - donations).toLocaleString()} left!
+          Rs{donations.toLocaleString()} donated towards Rs{nextAchievement.toLocaleString()}!
         </Text>
-        <ProgressBarAndroid
-          styleAttr="Horizontal"
-          indeterminate={false}
-          progress={progress}
-          color="#007AFF"
-          style={styles.progressBar}
-        />
+        <View style={styles.progressBar}>
+          <View style={[styles.progressFill, { width: `${progress}%` }]} />
+        </View>
       </View>
 
-      {/* Fundraise Button */}
       <TouchableOpacity style={styles.fundraiseButton} onPress={() => router.push('/fundraise/FundraiseForm')}>
         <Text style={styles.fundraiseButtonText}>Start a Fundraise</Text>
       </TouchableOpacity>
 
-      {/* List Contributed Programs */}
       <Text style={styles.programsText}>Programs Contributed:</Text>
-      <FlatList
-        data={programsContributed}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.programItem}>
+    </View>
+  );
+
+  return (
+    <FlatList
+      data={programsContributed}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({ item }) => (
+        <View style={styles.programItem}>
+          <Ionicons name="heart-outline" size={24} color="#738FFE" style={styles.programIcon} />
+          <View style={styles.programDetails}>
             <Text style={styles.programName}>{item.programName}</Text>
             <Text style={styles.programDonation}>
-              Donated: <Text style={styles.highlight}>${item.amountDonated.toLocaleString()}</Text>
+              Donated: <Text style={styles.highlight}>Rs{item.amountDonated.toLocaleString()}</Text>
             </Text>
           </View>
-        )}
-      />
-    </View>
+        </View>
+      )}
+      ListHeaderComponent={renderHeader}
+      contentContainerStyle={styles.container}
+    />
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    display: 'flex',
-    justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
     backgroundColor: '#f9f9f9',
-    height: '100%',
+  },
+  headerContainer: {
+    alignItems: 'center',
   },
   profileImage: {
     width: 120,
     height: 120,
     borderRadius: 60,
     borderWidth: 4,
-    borderColor: '#007AFF',
+    borderColor: '#738FFE',
     marginBottom: 20,
   },
   achievementContainer: {
@@ -171,19 +164,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   congratsText: {
-    fontFamily: 'outfit-bold',
     fontSize: 22,
     color: '#333',
   },
   subText: {
-    fontFamily: 'outfit-medium',
     fontSize: 16,
     color: '#555',
   },
   donationsText: {
-    fontFamily: 'outfit-medium',
     fontSize: 18,
-    color: '#007AFF',
+    color: '#738FFE',
     marginTop: 10,
   },
   highlight: {
@@ -195,7 +185,7 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     width: '100%',
     marginVertical: 20,
   },
@@ -203,12 +193,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statValue: {
-    fontFamily: 'outfit-bold',
     fontSize: 22,
     color: '#333',
   },
   statLabel: {
-    fontFamily: 'outfit-medium',
     fontSize: 14,
     color: '#777',
   },
@@ -218,26 +206,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   impactTitle: {
-    fontFamily: 'outfit-bold',
     fontSize: 18,
     color: '#333',
   },
   progressText: {
-    fontFamily: 'outfit-medium',
     fontSize: 14,
     color: '#777',
     marginVertical: 10,
   },
   progressBar: {
-    width: '100%',
+    height: 10,
+    width: '90%',
+    backgroundColor: '#e0e0e0',
+    borderRadius: 5,
+    overflow: 'hidden',
+    marginBottom: 10,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#738FFE',
+    borderRadius: 5,
   },
   programsText: {
-    fontFamily: 'outfit-bold',
     fontSize: 18,
     color: '#333',
     marginVertical: 10,
   },
   programItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 10,
     padding: 15,
     backgroundColor: '#fff',
@@ -248,6 +245,12 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
     elevation: 5,
+  },
+  programIcon: {
+    marginRight: 10,
+  },
+  programDetails: {
+    flex: 1,
   },
   programName: {
     fontSize: 16,
@@ -260,13 +263,12 @@ const styles = StyleSheet.create({
     color: '#555',
   },
   fallbackText: {
-    fontFamily: 'outfit-medium',
     fontSize: 16,
-    color: '#777',
+    color: '#738FFE',
     marginBottom: 10,
   },
   fundraiseButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#738FFE',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',

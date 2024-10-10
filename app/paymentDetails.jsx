@@ -1,25 +1,21 @@
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, Alert, KeyboardAvoidingView, ScrollView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import React, { useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { doc, getDoc, setDoc, updateDoc, increment, arrayUnion } from 'firebase/firestore'; // Firestore imports
+import { doc, getDoc, setDoc, updateDoc, increment, arrayUnion } from 'firebase/firestore';
 import { db } from '../configs/FirebaseConfig';
-import { useUser } from '@clerk/clerk-expo'; // Import Clerk's useUser hook
-import * as Animatable from 'react-native-animatable'; // For simple animations
+import { useUser } from '@clerk/clerk-expo';
+import * as Animatable from 'react-native-animatable';
 
 export default function PaymentDetails() {
-  const { amount, programID } = useLocalSearchParams(); // Get donation amount and programID from params
+  const { amount, programID } = useLocalSearchParams();
   const router = useRouter();
-  
-  // Use Clerk's useUser hook to get the authenticated user
   const { user } = useUser();
 
-  // State to hold card details
   const [cardName, setCardName] = useState('');
   const [cardNumber, setCardNumber] = useState('');
   const [expirationDate, setExpirationDate] = useState('');
   const [cvc, setCvc] = useState('');
 
-  // Handle Payment Function
   const handlePayment = async () => {
     try {
       const userID = user?.id; // Fetch the authenticated user's ID from Clerk
@@ -79,7 +75,7 @@ export default function PaymentDetails() {
       // Show success alert
       Alert.alert(
         'Thank You!',
-        `Your donation of $${amount} was successful to ${programName}.`,
+        `Your donation of Rs${amount} was successful to ${programName}.`,
         [{ text: 'OK', onPress: () => router.push('/thankYou') }]
       );
 
@@ -90,67 +86,105 @@ export default function PaymentDetails() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Payment Options UI */}
-      <View style={styles.paymentOptions}>
-        <TouchableOpacity style={styles.paymentOption}>
-          <Text>Credit Card</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.paymentOption}>
-          <Text>Venmo</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.paymentOption}>
-          <Text>PayPal</Text>
-        </TouchableOpacity>
-      </View>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          {/* Header */}
+          <Text style={styles.headerText}>Payment data</Text>
+          <Text style={styles.amountText}>Total price</Text>
+          <Text style={styles.amountValue}>Rs{amount}</Text>
 
-      {/* Animated Card Details Form */}
-      <Animatable.View animation="fadeInUp" delay={200} style={styles.formContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Cardholder Name"
-          value={cardName}
-          onChangeText={setCardName}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Card Number"
-          value={cardNumber}
-          onChangeText={setCardNumber}
-          keyboardType="numeric"
-        />
-        <View style={styles.row}>
-          <TextInput
-            style={[styles.input, styles.smallInput]}
-            placeholder="Expiration Date (MM/YY)"
-            value={expirationDate}
-            onChangeText={setExpirationDate}
-          />
-          <TextInput
-            style={[styles.input, styles.smallInput]}
-            placeholder="CVC"
-            value={cvc}
-            onChangeText={setCvc}
-            keyboardType="numeric"
-          />
-        </View>
-      </Animatable.View>
+          {/* Payment Method Selection */}
+          <View style={styles.paymentOptions}>
+            <TouchableOpacity style={[styles.paymentOption, styles.selectedOption]}>
+              <Text style={[styles.paymentOptionText, styles.selectedOptionText]}>Credit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.paymentOption}>
+              <Text style={styles.paymentOptionText}>PayPal</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.paymentOption}>
+              <Text style={styles.paymentOptionText}>Wallet</Text>
+            </TouchableOpacity>
+          </View>
 
-      {/* Donate Now Button with animation */}
-      <Animatable.View animation="pulse" iterationCount="infinite">
-        <TouchableOpacity style={styles.donateButton} onPress={handlePayment}>
-          <Text style={styles.donateButtonText}>Donate ${amount}</Text>
-        </TouchableOpacity>
-      </Animatable.View>
-    </View>
+          {/* Card Details Form */}
+          <Animatable.View animation="fadeInUp" delay={200} style={styles.formContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Card number"
+              placeholderTextColor="#A1A1A1"
+              value={cardNumber}
+              onChangeText={setCardNumber}
+              keyboardType="numeric"
+            />
+            <View style={styles.row}>
+              <TextInput
+                style={[styles.input, styles.smallInput]}
+                placeholder="Month / Year"
+                placeholderTextColor="#A1A1A1"
+                value={expirationDate}
+                onChangeText={setExpirationDate}
+              />
+              <TextInput
+                style={[styles.input, styles.smallInput]}
+                placeholder="CVV"
+                placeholderTextColor="#A1A1A1"
+                value={cvc}
+                onChangeText={setCvc}
+                keyboardType="numeric"
+              />
+            </View>
+            <TextInput
+              style={styles.input}
+              placeholder="Cardholder Name"
+              placeholderTextColor="#A1A1A1"
+              value={cardName}
+              onChangeText={setCardName}
+            />
+          </Animatable.View>
+
+          {/* Donate Button */}
+          <Animatable.View animation="pulse" iterationCount="infinite">
+            <TouchableOpacity style={styles.donateButton} onPress={handlePayment}>
+              <Text style={styles.donateButtonText}>Proceed to confirm</Text>
+            </TouchableOpacity>
+          </Animatable.View>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F8F9FC',
+  },
+  scrollContainer: {
     padding: 20,
-    backgroundColor: '#fff',
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  amountText: {
+    fontSize: 16,
+    color: '#A1A1A1',
+    textAlign: 'left',
+    marginBottom: 5,
+  },
+  amountValue: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#738FFE',
+    textAlign: 'left',
+    marginBottom: 20,
   },
   paymentOptions: {
     flexDirection: 'row',
@@ -158,22 +192,37 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   paymentOption: {
-    padding: 10,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 10,
-    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#DDD',
+    backgroundColor: '#F0F0F0',
+  },
+  selectedOption: {
+    backgroundColor: '#738FFE',
+    borderColor: '#738FFE',
+  },
+  paymentOptionText: {
+    fontSize: 14,
+    color: '#333',
+  },
+  selectedOptionText: {
+    color: '#FFF',
+    fontWeight: '600',
   },
   formContainer: {
     marginBottom: 20,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#E0E0E0',
+    backgroundColor: '#FFF',
     padding: 15,
     borderRadius: 10,
-    marginBottom: 15,
     fontSize: 16,
-    width: '100%',
+    marginBottom: 15,
+    color: '#333',
   },
   row: {
     flexDirection: 'row',
@@ -183,13 +232,15 @@ const styles = StyleSheet.create({
     width: '48%',
   },
   donateButton: {
-    backgroundColor: '#E74C3C',
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: '#738FFE',
+    paddingVertical: 15,
+    borderRadius: 25,
     alignItems: 'center',
+    marginTop: 20,
   },
   donateButtonText: {
-    color: '#fff',
+    color: '#FFF',
     fontSize: 18,
+    fontWeight: '600',
   },
 });
