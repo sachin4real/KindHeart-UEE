@@ -11,13 +11,14 @@ export default function TabLayout() {
     <Tabs.Screen name = 'home' 
     options={{
       tabBarLabel:'Home',
-      tabBarIcon:({color}) =><Entypo name="home" size={24} color="black" />
+      tabBarIcon:({color}) =><Entypo name="home" 
+      size={24} color={color} />
     }}
     />
     <Tabs.Screen name = 'profile'
     options={{
       tabBarLabel:'Profile',
-      tabBarIcon:({color}) =><Feather name="user" size={24} color="black" />
+      tabBarIcon:({color}) =><Feather name="user" size={24} color={color} />
     }}
     />
    </Tabs>

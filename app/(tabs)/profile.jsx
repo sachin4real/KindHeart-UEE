@@ -1,10 +1,17 @@
 import { View, Text } from 'react-native'
 import React from 'react'
+import Userintro from '../../components/Profile/Userintro'
 
 export default function profile() {
   return (
-    <View>
-      <Text>profile</Text>
+
+    <View style={{
+      padding:20
+    }}>
+      
+
+      <Userintro/>
+
     </View>
   )
 }
