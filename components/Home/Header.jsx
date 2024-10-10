@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     container: {
         padding: 20,
         paddingTop: 40,
-        backgroundColor: '#fff',
+        backgroundColor: '#738FFE',
     },
     row: {
         flexDirection: 'row',
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     },
     subText: {
         fontSize: 14,
-        color: '#666',
+        color: '#fff',
         marginTop: 4,
     },
     profileImage: {

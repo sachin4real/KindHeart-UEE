@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#0a7ea4',
+    backgroundColor: '#738FFE',
     borderRadius: 5,
   },
   label: {
@@ -205,15 +205,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   amountButtonSelected: {
-    backgroundColor: '#e0e0ff',
-    borderColor: '#8a2be2',
+    backgroundColor: '#738FFE',
+    borderColor: '#738FFE',
   },
   amountText: {
     fontSize: 16,
     color: '#000',
   },
   amountTextSelected: {
-    color: '#8a2be2',
+    color: '#fff',
   },
   input: {
     borderWidth: 1,
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   donateButton: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#738FFE',
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',
