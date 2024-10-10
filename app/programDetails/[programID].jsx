@@ -61,7 +61,7 @@ export default function ProgramDetails() {
 
         {/* Donation Progress */}
         <Text style={styles.donationText}>
-          {`$${program.donatedAmount} / $${program.goalAmount}`}
+          {`Rs${program.donatedAmount} / Rs${program.goalAmount}`}
         </Text>
         <View style={styles.progressBar}>
           <View style={[styles.progressFill, { width: `${donationPercentage}%` }]} />

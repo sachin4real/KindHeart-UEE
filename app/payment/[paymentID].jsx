@@ -67,7 +67,7 @@ export default function Payment() {
           <Text style={styles.headerText}>{program.name}</Text>
 
           {/* Donation Progress */}
-          <Text style={styles.donationText}>{`$${program.donatedAmount} / $${program.goalAmount}`}</Text>
+          <Text style={styles.donationText}>{`Rs${program.donatedAmount} / Rs${program.goalAmount}`}</Text>
 
           {/* Progress Bar */}
           <View style={styles.progressBar}>
@@ -77,7 +77,7 @@ export default function Payment() {
           {/* Predefined Donation Amounts */}
           <Text style={styles.label}>Donation Amount</Text>
           <View style={styles.predefinedAmounts}>
-            {['5.00', '15.00', '25.00'].map((amount) => (
+            {['5000', '10000', '50000'].map((amount) => (
               <TouchableOpacity
                 key={amount}
                 style={[
@@ -87,7 +87,7 @@ export default function Payment() {
                 onPress={() => setPredefinedAmount(amount)}
               >
                 <Text style={[styles.amountText, predefinedAmount === amount && styles.amountTextSelected]}>
-                  ${amount}
+                  Rs{amount}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -97,6 +97,7 @@ export default function Payment() {
           <TextInput
             style={styles.input}
             placeholder="Enter your donation amount"
+            placeholderTextColor="#888"
             keyboardType="numeric"
             value={donationAmount}
             onChangeText={(value) => setDonationAmount(value)}
