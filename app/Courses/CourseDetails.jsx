@@ -1,10 +1,18 @@
+// app/Courses/CourseDetails.jsx
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
 
-const CourseDetails = ({ name, rating, reviews, imageUrl }) => {
+const CourseDetails = ({ id, name, rating, reviews, imageUrl }) => {
+  const navigation = useNavigation();
+
+  const handlePress = () => {
+    navigation.navigate('Courses/CourseDetailPage', { courseID: id }); // Pass the courseID when navigating
+  };
+
   return (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={handlePress}>
       <Image source={{ uri: imageUrl }} style={styles.image} />
       <View style={styles.info}>
         <Text style={styles.name}>{name}</Text>
@@ -13,7 +21,7 @@ const CourseDetails = ({ name, rating, reviews, imageUrl }) => {
           <Text style={styles.rating}>{rating} ({reviews})</Text>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
