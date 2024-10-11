@@ -1,9 +1,9 @@
-import { View, Text, ActivityIndicator, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ActivityIndicator, Image, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../configs/FirebaseConfig';
-import { Ionicons, FontAwesome } from '@expo/vector-icons'; // Icons for the bottom icons
+import { Ionicons, FontAwesome } from '@expo/vector-icons'; 
 
 export default function ProgramDetails() {
   const { programID } = useLocalSearchParams();
@@ -41,6 +41,16 @@ export default function ProgramDetails() {
 
   const donationPercentage = (program.donatedAmount / program.goalAmount) * 100;
 
+  const handleHelpNowPress = () => {
+    // Check if the donation goal is already met
+    if (program.donatedAmount >= program.goalAmount) {
+      Alert.alert("Goal Reached", "This charity program has already reached its donation goal.");
+    } else {
+      // Navigate to payment if the goal hasn't been reached
+      router.push(`/payment/${programID}`);
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       {/* Program Image Section */}
@@ -64,7 +74,7 @@ export default function ProgramDetails() {
           {`Rs${program.donatedAmount} / Rs${program.goalAmount}`}
         </Text>
         <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: `${donationPercentage}%` }]} />
+          <View style={[styles.progressFill, { width: `${Math.min(donationPercentage, 100)}%` }]} />
         </View>
 
         {/* About Section */}
@@ -72,10 +82,7 @@ export default function ProgramDetails() {
         <Text style={styles.aboutText}>{program.about}</Text>
 
         {/* Help Now Button */}
-        <TouchableOpacity
-          style={styles.helpNowButton}
-          onPress={() => router.push(`/payment/${programID}`)}
-        >
+        <TouchableOpacity style={styles.helpNowButton} onPress={handleHelpNowPress}>
           <Text style={styles.helpNowButtonText}>Help Now</Text>
         </TouchableOpacity>
       </View>
@@ -104,7 +111,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Darker overlay for text visibility
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', 
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
   },
@@ -127,7 +134,7 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   contentContainer: {
-    marginTop: -30, // Pulls the content slightly upwards to create a better section division
+    marginTop: -30,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     backgroundColor: '#fff',

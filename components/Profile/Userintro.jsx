@@ -1,6 +1,6 @@
 import { View, Text, Image, StyleSheet, ActivityIndicator, FlatList, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-expo';
+import { useUser, useAuth } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../configs/FirebaseConfig';
@@ -8,6 +8,7 @@ import { useRouter } from 'expo-router';
 
 export default function Userintro() {
   const { user } = useUser();
+  const { signOut } = useAuth();
   const [donations, setDonations] = useState(0);
   const [programsContributed, setProgramsContributed] = useState([]);
   const [achievements, setAchievements] = useState(null);
@@ -65,7 +66,12 @@ export default function Userintro() {
 
     setAchievements(achievement);
     setNextAchievement(next);
-    setProgress((totalDonations / next) * 100); // Progress as a percentage
+    setProgress((totalDonations / next) * 100);
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    router.replace("/"); // Redirects to the root screen after sign-out
   };
 
   if (loading) {
@@ -121,6 +127,13 @@ export default function Userintro() {
     </View>
   );
 
+  const renderFooter = () => (
+    <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+     
+      <Text style={styles.logoutText}>Log Out</Text>
+    </TouchableOpacity>
+  );
+
   return (
     <FlatList
       data={programsContributed}
@@ -137,6 +150,7 @@ export default function Userintro() {
         </View>
       )}
       ListHeaderComponent={renderHeader}
+      ListFooterComponent={renderFooter} // Add logout button at the end of the list
       contentContainerStyle={styles.container}
     />
   );
@@ -278,5 +292,22 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    backgroundColor: '#FF5C5C',
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    borderRadius: 10,
+   
+    marginTop: 20,
+    width: '80%',
+    alignSelf: 'center',
+  },
+  logoutText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+   
   },
 });

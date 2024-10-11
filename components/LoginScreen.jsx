@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     image: {
         width: '90%',  // Increased width to make the image larger
         height: '70%', // Adjust height to make the image taller
-        marginBottom: 20,  // Space between image and button
+        marginBottom: 70,  // Space between image and button
     },
     getStartedButton: {
         position: 'absolute',  // Position the button at the bottom
