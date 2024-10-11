@@ -66,6 +66,9 @@ export default function EducationPage() {
   const handleExternalCoursesPress = () => {
     navigation.navigate('Courses/ExternalCoursesPage'); // Navigate to ExternalCoursesPage
   };
+  const handleQuizPress = () => {
+    navigation.navigate('Courses/QuizPage'); // Navigate to QuizPage
+  };
 
   if (loading) {
     return (
@@ -94,8 +97,8 @@ export default function EducationPage() {
 
       <Text style={styles.exploreText}>Explore Topics</Text>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.roundButton}>
-          <Text style={styles.buttonText}>Quizzes</Text>
+        <TouchableOpacity style={styles.roundButton} onPress={handleQuizPress}>
+          <Text style={styles.buttonText}>Quizes</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.roundButton} onPress={handleExternalCoursesPress}>
           <Text style={styles.buttonText}>External Courses</Text>

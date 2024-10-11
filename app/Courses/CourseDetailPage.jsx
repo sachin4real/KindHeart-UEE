@@ -1,3 +1,4 @@
+//app/Courses/CourseDetailPage.jsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, Image, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';

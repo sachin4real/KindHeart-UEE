@@ -2,16 +2,13 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
 
-const CourseDetails = ({ name, rating, reviews, imageUrl, navigation }) => {
+const CourseDetails = ({ id, name, rating, reviews, imageUrl }) => {
+  const navigation = useNavigation();
+
   const handlePress = () => {
-    // Navigate to CourseDetailPage with course data
-    navigation.push('Courses/CourseDetailPage', { // Ensure this matches your route
-      name,
-      rating,
-      imageUrl,
-      about,
-    });
+    navigation.navigate('Courses/CourseDetailPage', { courseID: id }); // Pass the courseID when navigating
   };
 
   return (
@@ -65,5 +62,4 @@ const styles = StyleSheet.create({
   },
 });
 
-// Export the component with the correct name
 export default CourseDetails;
