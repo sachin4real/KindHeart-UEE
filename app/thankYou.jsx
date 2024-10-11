@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   iconContainer: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#738FFE',
     padding: 30,
     borderRadius: 100,
     marginBottom: 30,
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   homeButton: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#738FFE',
     paddingVertical: 15,
     paddingHorizontal: 40,
     borderRadius: 10,

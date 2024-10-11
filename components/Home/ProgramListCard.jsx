@@ -4,13 +4,13 @@ import { TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 
 export default function ProgramListCard({ program }) {
-  const router=useRouter();
-  // Calculate donation percentage
-  const donationPercentage = (program.donatedAmount / program.goalAmount) * 100;
+  const router = useRouter();
+  // Calculate donation percentage, ensuring it caps at 100
+  const donationPercentage = Math.min((program.donatedAmount / program.goalAmount) * 100, 100);
 
   return (
     <TouchableOpacity style={styles.card}
-      onPress={()=>router.push('/programDetails/'+program.id)}
+      onPress={() => router.push('/programDetails/' + program.id)}
     >
       <Image
         source={{ uri: program.imageUrl }}
@@ -19,13 +19,14 @@ export default function ProgramListCard({ program }) {
       <View style={styles.textContainer}>
         <Text style={styles.programName}>{program.name}</Text>
         <Text style={styles.donationText}>
-          {`$${program.donatedAmount} / $${program.goalAmount}`}
+          {`Rs${program.donatedAmount} / Rs${program.goalAmount}`}
         </Text>
         <View style={styles.progressBar}>
+          {/* Set width to 100% if donationPercentage is 100 or higher */}
           <View style={[styles.progressFill, { width: `${donationPercentage}%` }]} />
         </View>
         <Text style={styles.percentageText}>
-          {donationPercentage.toFixed(2)}% of goal achieved
+          {donationPercentage >= 100 ? 'Completed' : `${donationPercentage.toFixed(2)}% of goal achieved`}
         </Text>
       </View>
     </TouchableOpacity>
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#0a7ea4',
+    backgroundColor: '#738FFE',
     borderRadius: 5,
   },
   percentageText: {
