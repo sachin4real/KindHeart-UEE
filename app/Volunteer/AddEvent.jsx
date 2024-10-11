@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import React, { useState } from 'react';
 import { db } from '../../configs/FirebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 export default function AddEvent() {
   const [name, setName] = useState('');
   const [imgUrl, setImgUrl] = useState('');
+  const [loading, setLoading] = useState(false); // Loading state
   const navigation = useNavigation();
 
   // Function to handle event addition
@@ -17,6 +18,8 @@ export default function AddEvent() {
       return;
     }
     
+    setLoading(true); // Start loading
+
     try {
       await addDoc(collection(db, 'events'), {
         name: name,
@@ -29,6 +32,8 @@ export default function AddEvent() {
     } catch (error) {
       console.error('Error adding event:', error);
       Alert.alert('Error', 'Could not add event. Please try again.');
+    } finally {
+      setLoading(false); // Stop loading after the operation completes
     }
   };
 
@@ -55,9 +60,14 @@ export default function AddEvent() {
         onChangeText={(text) => setImgUrl(text)}
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleAddEvent}>
-        <Text style={styles.buttonText}>Add Event</Text>
-      </TouchableOpacity>
+      {/* Display loading indicator or Add Event button based on loading state */}
+      {loading ? (
+        <ActivityIndicator size="large" color="#007bff" />
+      ) : (
+        <TouchableOpacity style={styles.button} onPress={handleAddEvent}>
+          <Text style={styles.buttonText}>Add Event</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

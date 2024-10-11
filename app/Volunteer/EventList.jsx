@@ -1,6 +1,6 @@
 // EventList.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { db } from '../../configs/FirebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
 import EventListCard from '../../components/Volunteer/EventListCard';
@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 export default function EventList() {
   const router = useRouter();
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true); // Loading state
   const { user } = useUser();
   const navigation = useNavigation();
 
@@ -31,6 +32,8 @@ export default function EventList() {
         setEvents(eventsList);
       } catch (error) {
         console.error('Error fetching events:', error);
+      } finally {
+        setLoading(false); // Set loading to false after data is fetched
       }
     };
 
@@ -43,6 +46,14 @@ export default function EventList() {
       params: { documentId: eventId }, // Pass document ID as a parameter
     });
   };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007bff" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -147,5 +158,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f3f4f6',
   },
 });
