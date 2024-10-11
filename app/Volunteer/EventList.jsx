@@ -13,28 +13,37 @@ import { useRouter } from 'expo-router';
 export default function EventList() {
   const router = useRouter();
   const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true); // Loading state
+  const [myEvents, setMyEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showAllEvents, setShowAllEvents] = useState(true); // State to toggle view
   const { user } = useUser();
   const navigation = useNavigation();
-  
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
+        // Fetch all events
         const eventsCollection = collection(db, 'events');
         const eventsSnapshot = await getDocs(eventsCollection);
-        const eventsList = eventsSnapshot.docs.map((doc) => {
-          return {
-            id: doc.id, // Include document ID
-            ...doc.data(),
-          };
-        });
+        const eventsList = eventsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        // Fetch user-specific events from myEvents collection
+        const myEventsCollection = collection(db, 'myEvents');
+        const myEventsSnapshot = await getDocs(myEventsCollection);
+        const myEventsList = myEventsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
         setEvents(eventsList);
+        setMyEvents(myEventsList);
       } catch (error) {
         console.error('Error fetching events:', error);
       } finally {
-        setLoading(false); // Set loading to false after data is fetched
+        setLoading(false);
       }
     };
 
@@ -43,8 +52,8 @@ export default function EventList() {
 
   const handleEventPress = (eventId) => {
     router.push({
-      pathname: '/Volunteer/EventPage', // Make sure EventPage exists at this route
-      params: { documentId: eventId }, // Pass document ID as a parameter
+      pathname: '/Volunteer/EventPage',
+      params: { documentId: eventId },
     });
   };
 
@@ -70,22 +79,35 @@ export default function EventList() {
 
       <VolunteerSlider style={styles.slider} />
 
-      <View style={styles.container}>
-        <Text style={styles.title}>All Events</Text>
-        <FlatList
-          data={events}
-          renderItem={({ item }) => (
-            <EventListCard
-              event={item}
-              onPress={() => handleEventPress(item.id)} // Pass handleEventPress to EventListCard
-            />
-          )}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          columnWrapperStyle={styles.row}
-          contentContainerStyle={styles.listContainer}
-        />
+      {/* Toggle Buttons for All Events and My Events */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[styles.toggleButton, showAllEvents && styles.activeButton]}
+          onPress={() => setShowAllEvents(true)}
+        >
+          <Text style={styles.buttonText}>All Events</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.toggleButton, !showAllEvents && styles.activeButton]}
+          onPress={() => setShowAllEvents(false)}
+        >
+          <Text style={styles.buttonText}>My Events</Text>
+        </TouchableOpacity>
       </View>
+
+      <FlatList
+        data={showAllEvents ? events : myEvents} // Toggle between all events and my events
+        renderItem={({ item }) => (
+          <EventListCard
+            event={item}
+            onPress={() => handleEventPress(item.id)}
+          />
+        )}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={styles.row}
+        contentContainerStyle={styles.listContainer}
+      />
 
       {/* Floating Action Button (FAB) */}
       <TouchableOpacity
@@ -123,6 +145,26 @@ const styles = StyleSheet.create({
     marginTop: 50,
     marginVertical: 20,
     color: '#333',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 10,
+  },
+  toggleButton: {
+    backgroundColor: '#ddd',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginHorizontal: 5,
+  },
+  activeButton: {
+    backgroundColor: '#738FFE',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   listContainer: {
     paddingBottom: 20,
