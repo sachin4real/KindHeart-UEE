@@ -57,11 +57,11 @@ function AdminRedirect() {
 
   useEffect(() => {
     if (user) {
-      const adminEmail = "dulanimalka1@gmail.com"; // Replace with your admin email address
+      const adminEmail = "it22312358@my.sliit.lk"; // Replace with your admin email address
       if (user.primaryEmailAddress?.emailAddress === adminEmail) {
         // Redirect to admin dashboard if email matches
         setTimeout(() => {
-          router.replace('/admin');
+          router.replace('/adminDonate');
         }, 0);
       }
     }
