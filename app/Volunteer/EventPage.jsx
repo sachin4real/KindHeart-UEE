@@ -5,6 +5,7 @@ import { db } from '../../configs/FirebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 export default function EventPage() {
   const route = useRoute();
@@ -12,6 +13,8 @@ export default function EventPage() {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+
+  const router = useRouter();
 
   useEffect(() => {
     if (!documentId) {
@@ -48,9 +51,17 @@ export default function EventPage() {
     fetchEvent();
   }, [documentId]);
 
-  const handleJoin = () => {
-    Alert.alert("Joined", "You have successfully joined this event.");
-    // Additional logic for joining the event can be added here
+//   const handleJoin = () => {
+//     Alert.alert("Joined", "You have successfully joined this event.");
+//     // Additional logic for joining the event can be added here
+//   };
+    const handleJoin = () => {
+    Alert.alert("Joined", "You have successfully joined this event.", [
+      {
+        text: "OK",
+        onPress: () => router.push('/Volunteer/VolunteerJoinedPrompt')
+      }
+    ]);
   };
 
   if (loading) {
@@ -110,7 +121,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
   },
   scrollContent: {
-    padding: 16,
+    padding: 10,
     alignItems: 'center',
   },
   loading: {
@@ -119,7 +130,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 200,
+    height: 250,
     borderRadius: 10,
   },
   combinedContainer: {

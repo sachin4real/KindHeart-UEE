@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
+
 export default function AddEvent() {
   const [name, setName] = useState('');
   const [imgUrl, setImgUrl] = useState('');
