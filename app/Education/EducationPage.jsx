@@ -5,6 +5,7 @@ import { db } from '../../configs/FirebaseConfig';
 import { useUser } from '@clerk/clerk-expo';
 import { useNavigation } from '@react-navigation/native';
 
+
 const windowWidth = Dimensions.get('window').width;
 
 export default function EducationPage() {
@@ -39,7 +40,7 @@ export default function EducationPage() {
   const renderCourseItem = ({ item }) => (
     <TouchableOpacity 
       style={styles.courseItem} 
-      onPress={() => navigation.push('ExternalCoursesPage', { course: item })} // Use push to navigate to ExternalCoursesPage
+      onPress={() => navigation.push('Courses/CourseDetailsPage', { course: item })} // Use push to navigate to ExternalCoursesPage
     >
       <Image 
         source={{ uri: item.imageUrl }} 
@@ -61,6 +62,10 @@ export default function EducationPage() {
       </View>
     </TouchableOpacity>
   );
+
+  const handleExternalCoursesPress = () => {
+    navigation.navigate('Courses/ExternalCoursesPage'); // Navigate to ExternalCoursesPage
+  };
 
   if (loading) {
     return (
@@ -92,7 +97,7 @@ export default function EducationPage() {
         <TouchableOpacity style={styles.roundButton}>
           <Text style={styles.buttonText}>Quizzes</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.roundButton}>
+        <TouchableOpacity style={styles.roundButton} onPress={handleExternalCoursesPress}>
           <Text style={styles.buttonText}>External Courses</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.roundButton}>

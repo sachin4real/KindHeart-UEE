@@ -1,10 +1,21 @@
+// app/Courses/CourseDetails.jsx
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const CourseDetails = ({ name, rating, reviews, imageUrl }) => {
+const CourseDetails = ({ name, rating, reviews, imageUrl, navigation }) => {
+  const handlePress = () => {
+    // Navigate to CourseDetailPage with course data
+    navigation.push('Courses/CourseDetailPage', { // Ensure this matches your route
+      name,
+      rating,
+      imageUrl,
+      about,
+    });
+  };
+
   return (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={handlePress}>
       <Image source={{ uri: imageUrl }} style={styles.image} />
       <View style={styles.info}>
         <Text style={styles.name}>{name}</Text>
@@ -13,7 +24,7 @@ const CourseDetails = ({ name, rating, reviews, imageUrl }) => {
           <Text style={styles.rating}>{rating} ({reviews})</Text>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -54,4 +65,5 @@ const styles = StyleSheet.create({
   },
 });
 
+// Export the component with the correct name
 export default CourseDetails;

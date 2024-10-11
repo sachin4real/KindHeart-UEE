@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ScrollView } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../configs/FirebaseConfig'; // Update the import path if needed
 import CourseCard from './CourseDetails'; // Ensure correct import path for your CourseDetails component
@@ -24,6 +24,7 @@ const ExternalCoursesPage = () => {
       rating={item.rating} 
       reviews={item.reviews} 
       imageUrl={item.imageUrl}
+      style={styles.courseCard} // Add custom styling if needed in CourseCard
     />
   );
 
@@ -33,12 +34,15 @@ const ExternalCoursesPage = () => {
       <View style={styles.banner}>
         <Text style={styles.bannerText}>Learning is the best thing</Text>
       </View>
-      <FlatList
-        data={courses}
-        renderItem={renderCourse}
-        keyExtractor={(item, index) => index.toString()}
-        showsVerticalScrollIndicator={false}
-      />
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <FlatList
+          data={courses}
+          renderItem={renderCourse}
+          keyExtractor={(item, index) => index.toString()}
+          showsVerticalScrollIndicator={false}
+          style={styles.list}
+        />
+      </ScrollView>
     </View>
   );
 };
@@ -46,24 +50,46 @@ const ExternalCoursesPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
+    backgroundColor: '#f9f9f9', // Light background color
+    padding: 20,
   },
   title: {
-    fontSize: 22,
+    textAlign:'center',
+    fontSize: 26, // Increased font size
     fontWeight: 'bold',
-    marginVertical: 10,
+    color: '#333', // Darker color for better contrast
+    //marginVertical: 15,
   },
   banner: {
-    backgroundColor: '#B7E0FF',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
+    backgroundColor: '#007AFF',
+    borderRadius: 15,
+    padding: 30,
+    marginTop:50,
+    marginBottom: 25,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+    elevation: 5, // For Android shadow
+    
   },
   bannerText: {
-    fontSize: 18,
-    color: '#fff',
-    fontWeight: 'bold',
+    fontSize: 40,
+    color: '#ffffff',
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  scrollContainer: {
+    paddingBottom: 20, // Add padding at the bottom for better scrolling
+  },
+  list: {
+    flexGrow: 1, // Ensure FlatList grows correctly in ScrollView
+  },
+  courseCard: {
+    marginBottom: 15, // Space between cards
   },
 });
 
