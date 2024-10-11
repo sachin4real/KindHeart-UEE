@@ -1,73 +1,173 @@
-import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import React, { useState } from 'react';
+import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+
 import { db } from '../../configs/FirebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+
 
 export default function AddEvent() {
   const [name, setName] = useState('');
   const [imgUrl, setImgUrl] = useState('');
-  const [loading, setLoading] = useState(false); // Loading state
+  const [description, setDescription] = useState('');
+  const [location, setLocation] = useState('');
+  const [startSchedule, setStartSchedule] = useState(new Date());
+  const [endSchedule, setEndSchedule] = useState(new Date());
+  const [capacity, setCapacity] = useState('');
+  const [availableSeats, setAvailableSeats] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
+
   const navigation = useNavigation();
 
-  // Function to handle event addition
   const handleAddEvent = async () => {
-    if (!name || !imgUrl) {
+    if (!name || !imgUrl || !description || !location || !startSchedule || !endSchedule || !capacity || !availableSeats) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
-    
-    setLoading(true); // Start loading
+
+    setLoading(true);
 
     try {
       await addDoc(collection(db, 'events'), {
-        name: name,
+        name,
         img: imgUrl,
+        description,
+        location,
+        startSchedule,
+        endSchedule,
+        capacity: parseInt(capacity, 10),
+        availableSeats: parseInt(availableSeats, 10),
       });
       Alert.alert('Success', 'Event added successfully');
-      
-      // Navigate back to the event list or another screen if needed
       navigation.goBack();
     } catch (error) {
       console.error('Error adding event:', error);
       Alert.alert('Error', 'Could not add event. Please try again.');
     } finally {
-      setLoading(false); // Stop loading after the operation completes
+      setLoading(false);
     }
+  };
+
+  const handleStartDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || startSchedule;
+    setShowStartPicker(false);
+    setStartSchedule(currentDate);
+  };
+
+  const handleEndDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || endSchedule;
+    setShowEndPicker(false);
+    setEndSchedule(currentDate);
   };
 
   return (
     <View style={styles.container}>
-      {/* Back Button */}
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={24} color="#333" />
       </TouchableOpacity>
 
-      <Text style={styles.title}>Add Volunteer Event</Text>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.title}>Add Volunteer Event</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Event Name"
-        value={name}
-        onChangeText={(text) => setName(text)}
-      />
-      
-      <TextInput
-        style={styles.input}
-        placeholder="Image URL"
-        value={imgUrl}
-        onChangeText={(text) => setImgUrl(text)}
-      />
+        <Text style={styles.label}>Event Name</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="E.g., Food for Needy"
+          value={name}
+          onChangeText={setName}
+        />
 
-      {/* Display loading indicator or Add Event button based on loading state */}
-      {loading ? (
-        <ActivityIndicator size="large" color="#007bff" />
-      ) : (
-        <TouchableOpacity style={styles.button} onPress={handleAddEvent}>
-          <Text style={styles.buttonText}>Add Event</Text>
+        <Text style={styles.label}>Description</Text>
+        <TextInput
+          style={styles.inputDescription}
+          placeholder="E.g., We aim to provide food packs..."
+          value={description}
+          onChangeText={setDescription}
+          multiline
+        />
+
+        <Text style={styles.label}>Image URL</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="E.g., https://example.com/event-image.jpg"
+          value={imgUrl}
+          onChangeText={setImgUrl}
+        />
+
+        <Text style={styles.label}>Location</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="E.g., Malabe Child Care"
+          value={location}
+          onChangeText={setLocation}
+        />
+
+        {/* Start Schedule Date and Time */}
+        <Text style={styles.label}>Start Schedule</Text>
+        <TouchableOpacity onPress={() => setShowStartPicker(true)}>
+          <TextInput
+            style={styles.input}
+            value={startSchedule.toLocaleString()}
+            editable={false}
+          />
         </TouchableOpacity>
-      )}
+        {showStartPicker && (
+          <DateTimePicker
+            value={startSchedule}
+            mode="datetime"
+            display="default"
+            onChange={handleStartDateChange}
+          />
+        )}
+
+        {/* End Schedule Date and Time */}
+        <Text style={styles.label}>End Schedule</Text>
+        <TouchableOpacity onPress={() => setShowEndPicker(true)}>
+          <TextInput
+            style={styles.input}
+            value={endSchedule.toLocaleString()}
+            editable={false}
+          />
+        </TouchableOpacity>
+        {showEndPicker && (
+          <DateTimePicker
+            value={endSchedule}
+            mode="datetime"
+            display="default"
+            onChange={handleEndDateChange}
+          />
+        )}
+
+        <Text style={styles.label}>Capacity</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="E.g., 20"
+          value={capacity}
+          onChangeText={setCapacity}
+          keyboardType="numeric"
+        />
+
+        <Text style={styles.label}>Available Seats</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="E.g., 5"
+          value={availableSeats}
+          onChangeText={setAvailableSeats}
+          keyboardType="numeric"
+        />
+
+        {loading ? (
+          <ActivityIndicator size="large" color="#007bff" />
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={handleAddEvent}>
+            <Text style={styles.buttonText}>Add Event</Text>
+          </TouchableOpacity>
+        )}
+      </ScrollView>
     </View>
   );
 }
@@ -75,17 +175,28 @@ export default function AddEvent() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
     backgroundColor: '#f3f4f6',
+  },
+  scrollContent: {
     alignItems: 'center',
-    justifyContent: 'center',
+    padding: 16,
+    paddingBottom: 30,
+    marginTop: 60,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
     color: '#333',
+  },
+  label: {
+    width: '90%',
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 5,
+    textAlign: 'left',
   },
   input: {
     height: 50,
@@ -96,6 +207,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 20,
     backgroundColor: '#fff',
+    color: '#333',
+  },
+  inputDescription: {
+    height: 90,
+    width: '90%',
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+    backgroundColor: '#fff',
+    color: '#333',
   },
   backButton: {
     position: 'absolute',
