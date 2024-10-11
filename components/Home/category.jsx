@@ -2,7 +2,8 @@ import { View, FlatList, StyleSheet, Dimensions } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { collection, getDocs, query } from 'firebase/firestore';
 import { db } from '../../configs/FirebaseConfig';
-import CategoryItem from '../CategoryItem';
+
+import CategoryItem from '../CategoryItem'
 import { useRouter } from 'expo-router';
 
 const windowWidth = Dimensions.get('window').width;
@@ -32,13 +33,20 @@ export default function Category({ onCategorySelect }) {
   };
 
   const handleCategoryPress = (category) => {
+
     if (category.name === 'Education') {
       // Navigate to the education page
       router.push('/Education/EducationPage');
+
+    else if (category.name === 'Volunteer') {
+      // Navigate to the education page
+      router.push('/Volunteer/EventList');
+
     } else {
       onCategorySelect(category);
     }
   };
+
 
   const renderCategoryItem = ({ item }) => (
     <CategoryItem category={item} onCategoryPress={handleCategoryPress} />
