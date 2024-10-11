@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
 import { db } from '../../configs/FirebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
-import EventListCard from '../../components/EventListCard';
+import EventListCard from '../../components/Volunteer/EventListCard';
+import VolunteerSlider from '../../components/Volunteer/VolunteerSlider';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import VolunteerHeader from '../../components/Volunteer/VolunteerHeader';
 
 export default function EventList() {
   const [events, setEvents] = useState([]);
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -28,6 +34,16 @@ export default function EventList() {
 
   return (
     <SafeAreaView style={styles.safeContainer}>
+
+    <VolunteerHeader/>
+
+       {/* Back Button */}
+       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="#333" />
+        </TouchableOpacity>
+
+    <VolunteerSlider style={styles.slider}/>
+
       <View style={styles.container}>
         <Text style={styles.title}>All Events</Text>
         <FlatList
@@ -68,4 +84,17 @@ const styles = StyleSheet.create({
   row: {
     justifyContent: 'space-between',
   },
+  slider: {
+    marginTop:40,
+    
+    height: 120,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 40, // Adjust top margin as needed for safe area
+    left: 10,
+    padding: 10,
+    zIndex: 10,
+  },
+
 });
