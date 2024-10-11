@@ -1,12 +1,15 @@
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { collection, getDocs, doc, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../configs/FirebaseConfig';
 import { useUser, useAuth } from '@clerk/clerk-expo';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [programs, setPrograms] = useState([]);
+  const [activeProgramsCount, setActiveProgramsCount] = useState(0);
+  const [donatorsCount, setDonatorsCount] = useState(0);
   const { user } = useUser();
   const { signOut } = useAuth();
 
@@ -17,11 +20,13 @@ export default function AdminDashboard() {
         const usersSnapshot = await getDocs(collection(db, 'Users'));
         const usersData = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setUsers(usersData);
+        setDonatorsCount(usersData.length);
 
         // Fetch Programs Data
         const programsSnapshot = await getDocs(collection(db, 'ProgramList'));
         const programsData = programsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setPrograms(programsData);
+        setActiveProgramsCount(programsData.length);
       } catch (error) {
         console.error('Error fetching data: ', error);
       }
@@ -33,6 +38,7 @@ export default function AdminDashboard() {
     try {
       await deleteDoc(doc(db, 'ProgramList', programId));
       setPrograms(programs.filter(program => program.id !== programId));
+      setActiveProgramsCount(activeProgramsCount - 1);
       Alert.alert('Success', 'Program deleted successfully!');
     } catch (error) {
       console.error('Error deleting program: ', error);
@@ -61,32 +67,32 @@ export default function AdminDashboard() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.header}>Hello Admin {user?.fullName || 'User'}!</Text>
-
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutText}>Log Out</Text>
-      </TouchableOpacity>
-
-      <View style={styles.section}>
-        <Text style={styles.subHeader}>User Donations</Text>
-        {users.map((user) => (
-          <View key={user.id} style={styles.card}>
-            <Text style={styles.cardTitle}>User ID: {user.id}</Text>
-            {user.donatedPrograms?.map((program, index) => (
-              <View key={index} style={styles.donationDetail}>
-                <Text>Program: {program.programName}</Text>
-                <Text>Amount Donated: Rs{program.amountDonated.toLocaleString()}</Text>
-              </View>
-            ))}
-            <Text>Total Donations: Rs{user.totalDonations?.toLocaleString() || 0}</Text>
-          </View>
-        ))}
+      {/* Header */}
+      <View style={styles.headerContainer}>
+        <Text style={styles.header}>Hello Admin {user?.fullName || 'User'}!</Text>
+        <TouchableOpacity style={styles.profileImageContainer}>
+          <Image source={{ uri: user?.profileImageUrl }} style={styles.profileImage} />
+        </TouchableOpacity>
       </View>
 
+      {/* Summary Cards */}
+      <View style={styles.summaryContainer}>
+        <View style={styles.summaryCard}>
+          <Text style={styles.summaryTitle}>All Programs</Text>
+          <Text style={styles.summaryValue}>{activeProgramsCount}</Text>
+        </View>
+        <View style={styles.summaryCard}>
+          <Text style={styles.summaryTitle}>All Donators</Text>
+          <Text style={styles.summaryValue}>{donatorsCount}</Text>
+        </View>
+      </View>
+
+      {/* Programs List */}
       <View style={styles.section}>
         <Text style={styles.subHeader}>Programs List</Text>
         {programs.map((program) => (
           <View key={program.id} style={styles.card}>
+            <Image source={{ uri: program.imageUrl }} style={styles.programImage} />
             <Text style={styles.cardTitle}>{program.name}</Text>
             <Text>About: {program.about}</Text>
             <Text>Category: {program.category}</Text>
@@ -103,6 +109,11 @@ export default function AdminDashboard() {
           </View>
         ))}
       </View>
+
+      {/* Logout Button */}
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutText}>Log Out</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -113,24 +124,49 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f1f1f1',
   },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   header: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 30,
-    textAlign: 'center',
     color: '#4b7bec',
   },
-  logoutButton: {
-    backgroundColor: '#eb3b5a',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignSelf: 'center',
-    marginBottom: 20,
+  profileImageContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    overflow: 'hidden',
   },
-  logoutText: {
+  profileImage: {
+    width: '100%',
+    height: '100%',
+  },
+  summaryContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 30,
+  },
+  summaryCard: {
+    backgroundColor: '#738FFE',
+    padding: 20,
+    borderRadius: 10,
+    flex: 1,
+    alignItems: 'center',
+    marginHorizontal: 5,
+  },
+  summaryTitle: {
+    fontSize: 16,
     color: '#ffffff',
+    marginBottom: 10,
+  },
+  summaryValue: {
+    fontSize: 24,
     fontWeight: 'bold',
+    color: '#ffffff',
   },
   section: {
     marginBottom: 30,
@@ -158,11 +194,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: '#2c3e50',
   },
-  donationDetail: {
-    marginLeft: 10,
-    marginBottom: 5,
-    fontSize: 16,
-    color: '#7f8c8d',
+  programImage: {
+    width: '100%',
+    height: 150,
+    borderRadius: 10,
+    marginBottom: 10,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -182,6 +218,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   buttonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  logoutButton: {
+    backgroundColor: '#eb3b5a',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  logoutText: {
     color: '#ffffff',
     fontWeight: 'bold',
   },
