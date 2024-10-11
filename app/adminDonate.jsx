@@ -1,9 +1,12 @@
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
+// AdminDashboard.jsx
+
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Image, Modal } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../configs/FirebaseConfig';
 import { useUser, useAuth } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
+import ReceivedMessages from './ReceivedMessages';
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -13,16 +16,18 @@ export default function AdminDashboard() {
   const { user } = useUser();
   const { signOut } = useAuth();
 
+  // State for side navigation and current view
+  const [showNav, setShowNav] = useState(false);
+  const [currentView, setCurrentView] = useState('dashboard');
+
   useEffect(() => {
     const fetchFirestoreData = async () => {
       try {
-        // Fetch Users Data
         const usersSnapshot = await getDocs(collection(db, 'Users'));
         const usersData = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setUsers(usersData);
         setDonatorsCount(usersData.length);
 
-        // Fetch Programs Data
         const programsSnapshot = await getDocs(collection(db, 'ProgramList'));
         const programsData = programsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setPrograms(programsData);
@@ -48,7 +53,6 @@ export default function AdminDashboard() {
 
   const handleUpdateProgram = async (programId) => {
     try {
-      // Example of updating the program's name (can be extended as needed)
       await updateDoc(doc(db, 'ProgramList', programId), {
         name: 'Updated Program Name'
       });
@@ -65,58 +69,90 @@ export default function AdminDashboard() {
     Alert.alert('Logged Out', 'You have been logged out successfully.');
   };
 
+  // Render received messages or admin dashboard based on the current view
+  const renderContent = () => {
+    if (currentView === 'receivedMessages') {
+      return <ReceivedMessages onBack={() => setCurrentView('dashboard')} />;
+    }
+
+    return (
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.summaryContainer}>
+          <View style={styles.summaryCard}>
+            <Text style={styles.summaryTitle}>All Programs</Text>
+            <Text style={styles.summaryValue}>{activeProgramsCount}</Text>
+          </View>
+          <View style={styles.summaryCard}>
+            <Text style={styles.summaryTitle}>All Donators</Text>
+            <Text style={styles.summaryValue}>{donatorsCount}</Text>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.subHeader}>Programs List</Text>
+          {programs.map((program) => (
+            <View key={program.id} style={styles.card}>
+              <Image source={{ uri: program.imageUrl }} style={styles.programImage} />
+              <Text style={styles.cardTitle}>{program.name}</Text>
+              <Text>About: {program.about}</Text>
+              <Text>Category: {program.category}</Text>
+              <Text>Donated Amount: Rs{program.donatedAmount.toLocaleString()}</Text>
+              <Text>Goal Amount: Rs{program.goalAmount.toLocaleString()}</Text>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteProgram(program.id)}>
+                  <Text style={styles.buttonText}>Delete</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.updateButton} onPress={() => handleUpdateProgram(program.id)}>
+                  <Text style={styles.buttonText}>Update</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </View>
+
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Log Out</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    );
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      {/* Header */}
+    <View style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.header}>Hello Admin {user?.fullName || 'User'}!</Text>
         <TouchableOpacity style={styles.profileImageContainer}>
           <Image source={{ uri: user?.profileImageUrl }} style={styles.profileImage} />
         </TouchableOpacity>
+        <TouchableOpacity onPress={() => setShowNav(true)} style={styles.navButton}>
+          <Ionicons name="menu" size={24} color="#fff" />
+        </TouchableOpacity>
       </View>
 
-      {/* Summary Cards */}
-      <View style={styles.summaryContainer}>
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>All Programs</Text>
-          <Text style={styles.summaryValue}>{activeProgramsCount}</Text>
-        </View>
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>All Donators</Text>
-          <Text style={styles.summaryValue}>{donatorsCount}</Text>
-        </View>
-      </View>
+      {renderContent()}
 
-      {/* Programs List */}
-      <View style={styles.section}>
-        <Text style={styles.subHeader}>Programs List</Text>
-        {programs.map((program) => (
-          <View key={program.id} style={styles.card}>
-            <Image source={{ uri: program.imageUrl }} style={styles.programImage} />
-            <Text style={styles.cardTitle}>{program.name}</Text>
-            <Text>About: {program.about}</Text>
-            <Text>Category: {program.category}</Text>
-            <Text>Donated Amount: Rs{program.donatedAmount.toLocaleString()}</Text>
-            <Text>Goal Amount: Rs{program.goalAmount.toLocaleString()}</Text>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteProgram(program.id)}>
-                <Text style={styles.buttonText}>Delete</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.updateButton} onPress={() => handleUpdateProgram(program.id)}>
-                <Text style={styles.buttonText}>Update</Text>
-              </TouchableOpacity>
-            </View>
+      {/* Side Navigation Modal */}
+      <Modal visible={showNav} animationType="slide" transparent>
+        <View style={styles.navContainer}>
+          <View style={styles.navContent}>
+            <Text style={styles.navTitle}>Navigation</Text>
+            <TouchableOpacity style={styles.navItem} onPress={() => setCurrentView('dashboard')}>
+              <Text style={styles.navText}>Dashboard</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.navItem} onPress={() => setCurrentView('receivedMessages')}>
+              <Text style={styles.navText}>Received Messages</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.closeButton} onPress={() => setShowNav(false)}>
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
           </View>
-        ))}
-      </View>
-
-      {/* Logout Button */}
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutText}>Log Out</Text>
-      </TouchableOpacity>
-    </ScrollView>
+        </View>
+      </Modal>
+    </View>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -144,6 +180,11 @@ const styles = StyleSheet.create({
   profileImage: {
     width: '100%',
     height: '100%',
+  },
+  navButton: {
+    backgroundColor: '#4b7bec',
+    borderRadius: 20,
+    padding: 10,
   },
   summaryContainer: {
     flexDirection: 'row',
@@ -232,5 +273,43 @@ const styles = StyleSheet.create({
   logoutText: {
     color: '#ffffff',
     fontWeight: 'bold',
+  },
+  navContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  navContent: {
+    width: '80%',
+    padding: 20,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    alignItems: 'center',
+  },
+  navTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  navItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    width: '100%',
+  },
+  navText: {
+    fontSize: 18,
+    color: '#333',
+  },
+  closeButton: {
+    backgroundColor: '#ff4d4d',
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 20,
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
