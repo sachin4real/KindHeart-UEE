@@ -9,7 +9,7 @@ export default function EventListCard({ event, onPress }) {
       <Text style={styles.name}>{event.name}</Text>
       
       <TouchableOpacity style={styles.joinButton} onPress={onPress}>
-        <Text style={styles.joinButtonText}>Join</Text>
+        <Text style={styles.joinButtonText}>View</Text>
       </TouchableOpacity>
     </TouchableOpacity>
   );

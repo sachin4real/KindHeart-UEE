@@ -2,9 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ActivityIndicator, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { db } from '../../configs/FirebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, addDoc } from 'firebase/firestore';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 export default function EventPage() {
   const route = useRoute();
@@ -12,6 +13,7 @@ export default function EventPage() {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+  const router = useRouter();
 
   useEffect(() => {
     if (!documentId) {
@@ -26,13 +28,9 @@ export default function EventPage() {
         if (eventSnap.exists()) {
           const eventData = eventSnap.data();
 
-          // Format start and end timestamps to date and time strings
-          if (eventData.start) {
-            eventData.start = eventData.start.toDate(); // Convert Firestore timestamp to JS Date object
-          }
-          if (eventData.end) {
-            eventData.end = eventData.end.toDate(); // Convert Firestore timestamp to JS Date object
-          }
+          // Convert Firestore timestamps to Date objects
+          if (eventData.start) eventData.start = eventData.start.toDate();
+          if (eventData.end) eventData.end = eventData.end.toDate();
 
           setEvent(eventData);
         } else {
@@ -48,9 +46,24 @@ export default function EventPage() {
     fetchEvent();
   }, [documentId]);
 
-  const handleJoin = () => {
-    Alert.alert("Joined", "You have successfully joined this event.");
-    // Additional logic for joining the event can be added here
+  const handleJoin = async () => {
+    try {
+      // Add event data to 'myEvents' collection
+      await addDoc(collection(db, 'myEvents'), {
+        name: event.name,
+        img: event.img,
+      });
+
+      Alert.alert("Joined", "You have successfully joined this event.", [
+        {
+          text: "OK",
+          onPress: () => router.push('/Volunteer/VolunteerJoinedPrompt')
+        }
+      ]);
+    } catch (error) {
+      console.error("Error joining event:", error);
+      Alert.alert("Error", "Could not join the event. Please try again.");
+    }
   };
 
   if (loading) {
@@ -110,7 +123,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
   },
   scrollContent: {
-    padding: 16,
+    padding: 10,
     alignItems: 'center',
   },
   loading: {
@@ -119,7 +132,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 200,
+    height: 250,
     borderRadius: 10,
   },
   combinedContainer: {

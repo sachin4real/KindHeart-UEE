@@ -123,6 +123,10 @@ export default function Userintro() {
         <Text style={styles.fundraiseButtonText}>Start a Fundraise</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity style={styles.MyVolunteer} onPress={() => router.push('/Volunteer/MyVolunteerEvents')}>
+        <Text style={styles.MyVolunteerButtonText}>My Volunteering</Text>
+      </TouchableOpacity>
+
       <Text style={styles.programsText}>Programs Contributed:</Text>
     </View>
   );
@@ -288,7 +292,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 20,
   },
+  MyVolunteer: {
+    backgroundColor: '#738FFE',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginVertical: 20,
+  },
   fundraiseButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  MyVolunteerButtonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
