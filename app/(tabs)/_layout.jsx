@@ -39,6 +39,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Feather name="phone" size={24} color={color} />
         }}
       />
+
+      <Tabs.Screen 
+        name="community" 
+        options={{
+          tabBarLabel: 'Community Forum',
+          tabBarIcon: ({ color }) => <Feather name="message-square" size={24} color={color} />
+        }}
+      />
     </Tabs>
   )
 }
