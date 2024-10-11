@@ -73,6 +73,8 @@ export default function EventPage() {
         <Ionicons name="arrow-back" size={24} color="#333" />
       </TouchableOpacity>
 
+      <Text style={styles.titleVoluntterOpp}>{event.name}</Text>
+
       {/* Scrollable Content */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Event Image */}
@@ -174,5 +176,13 @@ const styles = StyleSheet.create({
     left: 10,
     padding: 10,
     zIndex: 10,
+  },
+  titleVoluntterOpp: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 30,
+    marginVertical: 20,
+    color: '#333',
   },
 });
