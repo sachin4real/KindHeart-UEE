@@ -17,6 +17,7 @@
   "dependencies": {
     "@clerk/clerk-expo": "^2.2.17",
     "@expo/vector-icons": "^14.0.4",
+    "@react-native-community/datetimepicker": "^8.2.0",
     "@react-native-community/progress-view": "^1.4.2",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.11.0",
