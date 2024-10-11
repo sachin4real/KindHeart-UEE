@@ -2,11 +2,15 @@ import { View, FlatList, Text, StyleSheet, Dimensions, Image, TouchableOpacity }
 import React, { useEffect, useState } from 'react';
 import { collection, getDocs, query } from 'firebase/firestore';
 import { db } from '../../configs/FirebaseConfig';
+import { useUser } from '@clerk/clerk-expo';
+import { useNavigation } from '@react-navigation/native';
 
 const windowWidth = Dimensions.get('window').width;
 
-export default function EducationPage({ user }) {
+export default function EducationPage() {
   const [courses, setCourses] = useState([]);
+  const { user } = useUser(); // Access user data here
+  const navigation = useNavigation();
 
   useEffect(() => {
     fetchCourses();
@@ -25,20 +29,24 @@ export default function EducationPage({ user }) {
   };
 
   const renderCourseItem = ({ item }) => (
-    <View style={styles.courseItem}>
-      <Text style={styles.courseTitle}>{item.name}</Text>
+    <TouchableOpacity style={styles.courseItem}>
       <Image 
         source={{ uri: item.imageUrl }} 
         style={styles.courseImage} 
         resizeMode="cover" 
         onError={(error) => console.log('Image loading error:', error.nativeEvent.error)} 
       />
-    </View>
+      <Text style={styles.courseTitle}>{item.name}</Text>
+    </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      <View style={styles.row}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Text style={styles.backButtonText}>Back</Text>
+      </TouchableOpacity>
+
+      <View style={styles.userInfoContainer}>
         <View style={styles.greetingContainer}>
           <Text style={styles.greetingText}>Hello {user?.firstName}!</Text>
         </View>
@@ -62,6 +70,10 @@ export default function EducationPage({ user }) {
         </TouchableOpacity>
       </View>
 
+      <View style={styles.popularCourseHeader}>
+        <Text style={styles.popularCoursesText}>Popular Course</Text>
+        <Text style={styles.seeAllText}>See all</Text>
+      </View>
       <FlatList
         data={courses}
         renderItem={renderCourseItem}
@@ -76,40 +88,63 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#F8F9FA', // Light background for contrast
   },
-  row: {
+  backButton: {
+    marginBottom: 15,
+    padding: 10,
+    backgroundColor: '#007AFF',
+    borderRadius: 5,
+    alignSelf: 'flex-start',
+  },
+  backButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  userInfoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 20,
+    paddingVertical: 10,
   },
   greetingContainer: {
     flex: 1,
   },
   greetingText: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
+    color: '#333',
+    paddingBottom: 5,
   },
   profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: '#ccc',
   },
   learningBox: {
-    backgroundColor: '#A3C1DA',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 20,
+    backgroundColor: '#007AFF', // Bright blue box for emphasis
+    padding: 30, // Increased padding for larger box
+    borderRadius: 12,
+    marginBottom: 70,
+    alignItems: 'center',
+    height:170,
   },
   learningText: {
-    fontSize: 18,
+    fontSize: 40,
+    color: '#ffffff',
     textAlign: 'center',
-    color: '#000',
+    fontWeight: '600',
   },
   exploreText: {
     fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontWeight: '500',
+    color: '#333',
+    marginBottom: 15,
+    textAlign: 'center',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -117,41 +152,71 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   roundButton: {
-    backgroundColor: '#738FFE',
+    backgroundColor: '#F1F3F5', // Light background color
     borderRadius: 50,
-    padding: 15,
-    width: '25%',
+    paddingVertical: 15,
+    width: windowWidth * 0.28, // Responsive button width
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2.41,
+    elevation: 3,
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: '#007AFF',
+    fontWeight: '500',
+    fontSize: 14, // Increased font size for better readability
+  },
+  popularCourseHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  popularCoursesText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333',
+
+  },
+  seeAllText: {
+    fontSize: 14,
+    color: '#007AFF',
+    fontWeight: '500',
   },
   flatListContainer: {
     paddingBottom: 20,
   },
   courseItem: {
     backgroundColor: '#ffffff',
-    padding: 15,
+    padding: 20, // Increased padding for course items
     marginBottom: 15,
     borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 2,
     },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
-    elevation: 2,
+    elevation: 3,
   },
   courseTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginLeft: 15,
+    flexShrink: 1,
   },
   courseImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 8,
-    marginTop: 10,
+    width: 70, // Increased width for better visibility
+    height: 70, // Increased height for better visibility
+    borderRadius: 10,
   },
 });
