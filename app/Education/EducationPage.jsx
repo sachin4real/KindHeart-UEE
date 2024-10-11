@@ -1,4 +1,4 @@
-import { View, FlatList, Text, StyleSheet, Dimensions, Image, TouchableOpacity } from 'react-native';
+import { View, FlatList, Text, StyleSheet, Dimensions, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { collection, getDocs, query } from 'firebase/firestore';
 import { db } from '../../configs/FirebaseConfig';
@@ -9,6 +9,7 @@ const windowWidth = Dimensions.get('window').width;
 
 export default function EducationPage() {
   const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { user } = useUser(); // Access user data here
   const navigation = useNavigation();
 
@@ -17,28 +18,57 @@ export default function EducationPage() {
   }, []);
 
   const fetchCourses = async () => {
-    const q = query(collection(db, 'EducationCourses'));
-    const querySnapshot = await getDocs(q);
-    const fetchedCourses = [];
+    try {
+      const q = query(collection(db, 'EducationCourses'));
+      const querySnapshot = await getDocs(q);
+      const fetchedCourses = [];
 
-    querySnapshot.forEach((doc) => {
-      fetchedCourses.push(doc.data());
-    });
+      querySnapshot.forEach((doc) => {
+        fetchedCourses.push({ id: doc.id, ...doc.data() }); // Include doc ID
+      });
 
-    setCourses(fetchedCourses);
+      setCourses(fetchedCourses);
+      
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const renderCourseItem = ({ item }) => (
-    <TouchableOpacity style={styles.courseItem}>
+    <TouchableOpacity 
+      style={styles.courseItem} 
+      onPress={() => navigation.push('CourseDetailsPage', { course: item })} // Use push instead of navigate
+    >
       <Image 
         source={{ uri: item.imageUrl }} 
         style={styles.courseImage} 
         resizeMode="cover" 
         onError={(error) => console.log('Image loading error:', error.nativeEvent.error)} 
       />
-      <Text style={styles.courseTitle}>{item.name}</Text>
+      <View style={styles.courseInfo}>
+        <Text style={styles.courseTitle}>{item.name}</Text>
+        <Text style={styles.courseAbout}>{item.about || 'Description not available.'}</Text>
+
+        <View style={styles.ratingContainer}>
+          {Array.from({ length: 5 }, (_, index) => (
+            <Text key={index} style={styles.star}>
+              {index < item.rating ? '★' : '☆'} {/* Display filled or empty stars based on rating */}
+            </Text>
+          ))}
+        </View>
+      </View>
     </TouchableOpacity>
   );
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -71,13 +101,13 @@ export default function EducationPage() {
       </View>
 
       <View style={styles.popularCourseHeader}>
-        <Text style={styles.popularCoursesText}>Popular Course</Text>
-        <Text style={styles.seeAllText}>See all</Text>
+        <Text style={styles.popularCoursesText}>Popular Courses</Text>
       </View>
+
       <FlatList
         data={courses}
         renderItem={renderCourseItem}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item) => item.id}
         contentContainerStyle={styles.flatListContainer}
       />
     </View>
@@ -89,6 +119,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#F8F9FA', // Light background for contrast
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   backButton: {
     marginBottom: 15,
@@ -131,7 +166,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 70,
     alignItems: 'center',
-    height:170,
+    height: 170,
   },
   learningText: {
     fontSize: 40,
@@ -181,12 +216,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     color: '#333',
-
-  },
-  seeAllText: {
-    fontSize: 14,
-    color: '#007AFF',
-    fontWeight: '500',
   },
   flatListContainer: {
     paddingBottom: 20,
@@ -207,12 +236,29 @@ const styles = StyleSheet.create({
     shadowRadius: 1.41,
     elevation: 3,
   },
+  courseInfo: {
+    marginLeft: 15,
+    flex: 1,
+  },
   courseTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
-    marginLeft: 15,
-    flexShrink: 1,
+    marginBottom: 5,
+  },
+  courseAbout: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 10,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  star: {
+    fontSize: 18,
+    color: '#FFD700', // Gold color for stars
+    marginRight: 3,
   },
   courseImage: {
     width: 70, // Increased width for better visibility

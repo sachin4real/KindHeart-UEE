@@ -1,0 +1,103 @@
+import React from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+
+export default function CourseDetailsPage() {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { course } = route.params || {}; // Get course data from navigation params with a fallback
+
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Text style={styles.backButtonText}>Back</Text>
+      </TouchableOpacity>
+
+      {course ? (
+        <>
+          <Image source={{ uri: course.imageUrl }} style={styles.courseImage} />
+          <Text style={styles.courseTitle}>{course.name || 'Course Title Unavailable'}</Text>
+          <Text style={styles.courseAbout}>{course.about || 'No description available.'}</Text>
+
+          <View style={styles.enrollContainer}>
+            <Text style={styles.enrollText}>Enroll Now!</Text>
+            <TouchableOpacity 
+              style={styles.enrollButton} 
+              onPress={() => {
+                // Add enrollment logic here
+                console.log('Enrolled in course:', course.name);
+              }}>
+              <Text style={styles.enrollButtonText}>Enroll</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      ) : (
+        <Text style={styles.errorText}>Course not found.</Text>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#F8F9FA', // Light background
+    alignItems: 'center',
+  },
+  backButton: {
+    marginBottom: 15,
+    padding: 10,
+    backgroundColor: '#007AFF',
+    borderRadius: 5,
+    alignSelf: 'flex-start',
+  },
+  backButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  courseImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  courseTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 10,
+  },
+  courseAbout: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  enrollContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  enrollText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  enrollButton: {
+    backgroundColor: '#007AFF',
+    padding: 15,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  enrollButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 18,
+    marginTop: 20,
+  },
+});
