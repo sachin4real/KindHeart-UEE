@@ -39,7 +39,7 @@ export default function EducationPage() {
   const renderCourseItem = ({ item }) => (
     <TouchableOpacity 
       style={styles.courseItem} 
-      onPress={() => navigation.push('CourseDetailsPage', { course: item })} // Use push instead of navigate
+      onPress={() => navigation.push('ExternalCoursesPage', { course: item })} // Use push to navigate to ExternalCoursesPage
     >
       <Image 
         source={{ uri: item.imageUrl }} 
