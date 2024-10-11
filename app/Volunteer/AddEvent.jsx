@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
-
+import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { db } from '../../configs/FirebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-
 
 export default function AddEvent() {
   const [name, setName] = useState('');
@@ -65,12 +63,12 @@ export default function AddEvent() {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={24} color="#333" />
       </TouchableOpacity>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>Add Volunteer Event</Text>
 
         <Text style={styles.label}>Event Name</Text>
@@ -168,25 +166,26 @@ export default function AddEvent() {
           </TouchableOpacity>
         )}
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    paddingTop:30,
     flex: 1,
     backgroundColor: '#f3f4f6',
   },
   scrollContent: {
     alignItems: 'center',
     padding: 16,
-    paddingBottom: 30,
-    marginTop: 60,
+    paddingBottom: 60,  // Ensure extra padding at the bottom
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
+    marginTop: 20,
     textAlign: 'center',
     color: '#333',
   },

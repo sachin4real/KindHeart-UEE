@@ -57,7 +57,7 @@ export default function EventList() {
 
   return (
     <SafeAreaView style={styles.safeContainer}>
-      <Text style={styles.title}>Volunteer Opportunities</Text>
+      <Text style={styles.titleVoluntterOpp}>Volunteer Opportunities</Text>
 
       {/* Profile Image */}
       <Image source={{ uri: user?.imageUrl }} style={styles.profileImage} />
@@ -115,6 +115,14 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     color: '#333',
   },
+  titleVoluntterOpp: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 50,
+    marginVertical: 20,
+    color: '#333',
+  },
   listContainer: {
     paddingBottom: 20,
     paddingTop: 10,
@@ -139,7 +147,7 @@ const styles = StyleSheet.create({
     height: 45,
     borderRadius: 22.5,
     position: 'absolute',
-    top: 15,
+    top: 35,
     right: 16,
     zIndex: 10,
   },
@@ -147,7 +155,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 50,
     right: 20,
-    backgroundColor: '#007bff',
+    backgroundColor: '#738FFE',
     width: 60,
     height: 60,
     borderRadius: 30,

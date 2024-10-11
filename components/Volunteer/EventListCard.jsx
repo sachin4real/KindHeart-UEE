@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   joinButton: {
-    backgroundColor: '#007bff', // A nice blue color
+    backgroundColor: '#738FFE', // A nice blue color
     borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 20,
