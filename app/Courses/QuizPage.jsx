@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../configs/FirebaseConfig'; // Ensure the correct import for Firebase config
 
 const QuizPage = () => {
   const [questions, setQuestions] = useState([]);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [correctAnswersCount, setCorrectAnswersCount] = useState(0); // To count correct answers
 
   useEffect(() => {
     fetchQuestions();
@@ -24,6 +25,14 @@ const QuizPage = () => {
 
   const handleAnswerClick = (questionId, answer) => {
     setSelectedAnswer({ questionId, answer });
+
+    // Show pop-up message and count correct answers
+    if (answer.isAnswer) {
+      setCorrectAnswersCount(prevCount => prevCount + 1); // Increment correct answer count
+      Alert.alert('Correct!', 'You selected the right answer.');
+    } else {
+      Alert.alert('Incorrect', 'Sorry, that was not the correct answer.');
+    }
   };
 
   const renderAnswer = (questionId, answer) => {
@@ -62,6 +71,9 @@ const QuizPage = () => {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.quizContainer}
       />
+      <View style={styles.resultContainer}>
+        <Text style={styles.resultText}>Correct Answers: {correctAnswersCount}</Text>
+      </View>
     </View>
   );
 };
@@ -102,6 +114,23 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     textAlign: 'center',
+  },
+  resultContainer: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    alignItems: 'center',
+  },
+  resultText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
   },
 });
 
