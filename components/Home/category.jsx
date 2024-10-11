@@ -3,12 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { collection, getDocs, query } from 'firebase/firestore';
 import { db } from '../../configs/FirebaseConfig';
 import CategoryItem from '../CategoryItem'
+import { useRouter } from 'expo-router';
 
 // Get device width
 const windowWidth = Dimensions.get('window').width;
 
 export default function Category({ onCategorySelect }) {
   const [categoryList, setCategoryList] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     GetCategoryList();
@@ -31,8 +33,17 @@ export default function Category({ onCategorySelect }) {
     setCategoryList(sortedCategories);
   };
 
+  const handleCategoryPress = (category) => {
+    if (category.name === 'Volunteer') {
+      // Navigate to the education page
+      router.push('/Volunteer/EventList');
+    } else {
+      onCategorySelect(category);
+    }
+  };
+  
   const renderCategoryItem = ({ item }) => (
-    <CategoryItem category={item} onCategoryPress={onCategorySelect} />
+    <CategoryItem category={item} onCategoryPress={handleCategoryPress} />
   );
 
   return (
