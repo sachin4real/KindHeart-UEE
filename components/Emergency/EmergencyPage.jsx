@@ -1,7 +1,6 @@
-// EmergencyPage.jsx
-
 import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, Alert, TextInput, Vibration, Linking } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, Alert, TextInput, Vibration, Linking, Image } from 'react-native';
+import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import * as SMS from 'expo-sms';
 
 export default function EmergencyPage() {
@@ -24,6 +23,15 @@ export default function EmergencyPage() {
     Rescue: '105',
   };
 
+  const emergencyIcons = {
+    Medical: 'hospital',
+    Fire: 'fire-extinguisher',
+    'Natural Disaster': 'cloud-showers-heavy',
+    Accident: 'car-crash',
+    Violence: 'shield-alt',
+    Rescue: 'life-ring',
+  };
+
   const handleEmergencySelection = (service) => {
     setSelectedService(service);
     setShowConfirmModal(true);
@@ -36,15 +44,13 @@ export default function EmergencyPage() {
   };
 
   const initiateEmergencyCall = (mainNumber) => {
-    // Call main emergency number
     Linking.openURL(`tel:${mainNumber}`);
-    // Send emergency SMS to all contacts
     emergencyContacts.forEach(contact => {
       if (contact) {
         sendEmergencyMessage(contact);
       }
     });
-    Vibration.vibrate([500, 1000, 500]); // Vibration pattern
+    Vibration.vibrate([500, 1000, 500]);
   };
 
   const sendEmergencyMessage = async (number) => {
@@ -76,7 +82,7 @@ export default function EmergencyPage() {
         if (prevCount <= 1) {
           clearInterval(countdownInterval.current);
           Vibration.cancel();
-          initiateEmergencyCall('911'); // Main emergency number for SOS
+          initiateEmergencyCall('911');
         }
         return prevCount - 1;
       });
@@ -97,10 +103,15 @@ export default function EmergencyPage() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Are you in an emergency?</Text>
-      <Text style={styles.subtitle}>
-        Press the SOS button to quickly contact emergency services or select a specific type of emergency below.
-      </Text>
+      <View style={styles.header}>
+        <Image source={require('../../assets/images/contactus.jpeg')} style={styles.headerImage} />
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.title}>Are you in an emergency?</Text>
+          <Text style={styles.subtitle}>
+            Press the SOS button, and your live location will be shared with the nearest help center and your emergency contacts.
+          </Text>
+        </View>
+      </View>
 
       <TouchableOpacity
         style={styles.sosButton}
@@ -119,6 +130,7 @@ export default function EmergencyPage() {
             style={[styles.emergencyOption, { backgroundColor: getColor(service) }]}
             onPress={() => handleEmergencySelection(service)}
           >
+            <FontAwesome5 name={emergencyIcons[service]} size={24} color="#333" />
             <Text style={styles.emergencyOptionText}>{service}</Text>
           </TouchableOpacity>
         ))}
@@ -128,6 +140,7 @@ export default function EmergencyPage() {
         style={styles.addContactButton}
         onPress={() => setShowAddContactModal(true)}
       >
+        <MaterialIcons name="add" size={24} color="#fff" />
         <Text style={styles.addContactButtonText}>Add Emergency Contact</Text>
       </TouchableOpacity>
 
@@ -211,24 +224,36 @@ const getColor = (service) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
+    marginTop : 100,
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#f8fafc',
+    width : "100%",
+    height : "100%"
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    width: '100%',
+  },
+  headerImage: {
+    width: 150,
+    height: 170,
+    marginRight: 15,
+  },
+  headerTextContainer: {
+    flex: 1,
   },
   title: {
-    fontSize: 28,
+    fontSize: 27,
     fontWeight: 'bold',
     color: '#2d2d2d',
-    textAlign: 'center',
-    marginBottom: 10,
+    marginBottom : 15,
   },
   subtitle: {
     fontSize: 16,
     color: '#777',
-    textAlign: 'center',
-    marginBottom: 40,
   },
   sosButton: {
     width: 200,
@@ -243,6 +268,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 10,
     marginBottom: 20,
+    marginTop :20,
   },
   sosButtonText: {
     color: '#fff',
@@ -266,8 +292,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emergencyOption: {
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+    alignItems: 'center',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
     borderRadius: 20,
     margin: 5,
   },
@@ -275,9 +302,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 5,
   },
   addContactButton: {
-    backgroundColor: '#4c669f',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#007AFF',
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -286,6 +317,7 @@ const styles = StyleSheet.create({
   addContactButtonText: {
     color: '#fff',
     fontSize: 16,
+    marginLeft: 5,
   },
   modalBackground: {
     flex: 1,
@@ -312,7 +344,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   confirmButton: {
-    backgroundColor: '#4c669f',
+    backgroundColor: '#4CAF50',
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -323,7 +355,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   cancelButton: {
-    backgroundColor: '#bbb',
+    backgroundColor: '#ff4d4d',
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -342,7 +374,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   saveButton: {
-    backgroundColor: '#4c669f',
+    backgroundColor: '#007AFF',
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 20,
