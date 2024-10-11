@@ -16,6 +16,7 @@ export default function EventList() {
   const [loading, setLoading] = useState(true); // Loading state
   const { user } = useUser();
   const navigation = useNavigation();
+  
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -63,7 +64,7 @@ export default function EventList() {
       <Image source={{ uri: user?.imageUrl }} style={styles.profileImage} />
 
       {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.push('/home')}>
         <Ionicons name="arrow-back" size={24} color="#333" />
       </TouchableOpacity>
 
