@@ -1,9 +1,10 @@
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, Alert, KeyboardAvoidingView, ScrollView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, Alert, KeyboardAvoidingView, ScrollView, Platform, TouchableWithoutFeedback, Keyboard, Image } from 'react-native';
 import React, { useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { doc, getDoc, setDoc, updateDoc, increment, arrayUnion } from 'firebase/firestore';
 import { db } from '../configs/FirebaseConfig';
 import { useUser } from '@clerk/clerk-expo';
+import { Ionicons } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable';
 
 export default function PaymentDetails() {
@@ -16,7 +17,38 @@ export default function PaymentDetails() {
   const [expirationDate, setExpirationDate] = useState('');
   const [cvc, setCvc] = useState('');
 
+  const validatePaymentDetails = () => {
+    if (!cardName || !cardNumber || !expirationDate || !cvc) {
+      Alert.alert('Error', 'All fields are required.');
+      return false;
+    }
+    if (cardNumber.length !== 19) { // 16 digits with spaces
+      Alert.alert('Error', 'Card number must be 16 digits.');
+      return false;
+    }
+    if (!/^(0[1-9]|1[0-2])\/([0-9]{2})$/.test(expirationDate)) {
+      Alert.alert('Error', 'Expiration date must be in MM/YY format.');
+      return false;
+    }
+    const [month, year] = expirationDate.split('/');
+    const currentDate = new Date();
+    const currentYear = parseInt(currentDate.getFullYear().toString().slice(-2), 10);
+    const currentMonth = currentDate.getMonth() + 1;
+    if (parseInt(year, 10) < currentYear || (parseInt(year, 10) === currentYear && parseInt(month, 10) < currentMonth)) {
+      Alert.alert('Error', 'Card expiration date cannot be in the past.');
+      return false;
+    }
+    if (cvc.length !== 3) {
+      Alert.alert('Error', 'CVC must be 3 digits.');
+      return false;
+    }
+    return true;
+  };
+
   const handlePayment = async () => {
+    if (!validatePaymentDetails()) {
+      return;
+    }
     try {
       const userID = user?.id; // Fetch the authenticated user's ID from Clerk
 
@@ -85,6 +117,11 @@ export default function PaymentDetails() {
     }
   };
 
+  const handleCardNumberChange = (text) => {
+    const formattedText = text.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim();
+    setCardNumber(formattedText);
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -92,10 +129,23 @@ export default function PaymentDetails() {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {/* Header */}
-          <Text style={styles.headerText}>Payment data</Text>
-          <Text style={styles.amountText}>Total price</Text>
+          {/* Back Button */}
+        
+          
+          <View style={styles.headerContainer}>
+  <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+    <Ionicons name="arrow-back" size={24} color="#738FFE" />
+  </TouchableOpacity>
+  <Text style={styles.amountText}>Total Price</Text>
+</View>
           <Text style={styles.amountValue}>Rs{amount}</Text>
+
+          {/* Image between Payment Selection and Card Form */}
+          <Image 
+            source={require('../assets/images/card.png')} 
+            style={styles.image} 
+            resizeMode='contain' 
+          />
 
           {/* Payment Method Selection */}
           <View style={styles.paymentOptions}>
@@ -117,17 +167,20 @@ export default function PaymentDetails() {
               placeholder="Card number"
               placeholderTextColor="#A1A1A1"
               value={cardNumber}
-              onChangeText={setCardNumber}
+              onChangeText={handleCardNumberChange}
               keyboardType="numeric"
+              maxLength={19}
             />
             <View style={styles.row}>
               <TextInput
-                style={[styles.input, styles.smallInput]}
-                placeholder="Month / Year"
-                placeholderTextColor="#A1A1A1"
-                value={expirationDate}
-                onChangeText={setExpirationDate}
-              />
+  style={[styles.input, styles.smallInput]}
+  placeholder="MM/YY"
+  placeholderTextColor="#A1A1A1"
+  value={expirationDate}
+  onChangeText={(text) => setExpirationDate(text.length === 2 && !text.includes('/') ? text + '/' : text)}
+  keyboardType="numeric"
+  maxLength={5}
+/>
               <TextInput
                 style={[styles.input, styles.smallInput]}
                 placeholder="CVV"
@@ -135,15 +188,17 @@ export default function PaymentDetails() {
                 value={cvc}
                 onChangeText={setCvc}
                 keyboardType="numeric"
+                maxLength={3}
               />
             </View>
             <TextInput
-              style={styles.input}
-              placeholder="Cardholder Name"
-              placeholderTextColor="#A1A1A1"
-              value={cardName}
-              onChangeText={setCardName}
-            />
+  style={styles.input}
+  placeholder="Cardholder Name"
+  placeholderTextColor="#A1A1A1"
+  value={cardName}
+  onChangeText={setCardName}
+  keyboardType="default"
+/>
           </Animatable.View>
 
           {/* Donate Button */}
@@ -166,24 +221,36 @@ const styles = StyleSheet.create({
   scrollContainer: {
     padding: 20,
   },
-  headerText: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
+  backButton: {
     marginBottom: 10,
-    textAlign: 'center',
+  },
+  backIconContainer: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backIcon: {
+    width: 24,
+    height: 24,
+    tintColor: '#738FFE',
   },
   amountText: {
-    fontSize: 16,
+    fontSize: 20,
     color: '#A1A1A1',
     textAlign: 'left',
     marginBottom: 5,
   },
   amountValue: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: 'bold',
     color: '#738FFE',
     textAlign: 'left',
+    marginBottom: 20,
+  },
+  image: {
+    width: '100%',
+    height: 250,
     marginBottom: 20,
   },
   paymentOptions: {

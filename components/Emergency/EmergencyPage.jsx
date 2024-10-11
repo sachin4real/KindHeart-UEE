@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, Alert, TextInput, Vibration, Linking, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, Alert, TextInput, Vibration, Linking, Image, ScrollView } from 'react-native';
 import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import * as SMS from 'expo-sms';
 
@@ -102,7 +102,7 @@ export default function EmergencyPage() {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
         <Image source={require('../../assets/images/contactus.jpeg')} style={styles.headerImage} />
         <View style={styles.headerTextContainer}>
@@ -206,7 +206,7 @@ export default function EmergencyPage() {
           </View>
         </View>
       </Modal>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -224,12 +224,11 @@ const getColor = (service) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop : 100,
+    paddingTop: 80,
+    paddingHorizontal: 20,
     alignItems: 'center',
-    padding: 20,
     backgroundColor: '#f8fafc',
-    width : "100%",
-    height : "100%"
+    flexGrow: 1,
   },
   header: {
     flexDirection: 'row',
@@ -249,7 +248,7 @@ const styles = StyleSheet.create({
     fontSize: 27,
     fontWeight: 'bold',
     color: '#2d2d2d',
-    marginBottom : 15,
+    marginBottom: 15,
   },
   subtitle: {
     fontSize: 16,
@@ -268,7 +267,6 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 10,
     marginBottom: 20,
-    marginTop :20,
   },
   sosButtonText: {
     color: '#fff',
@@ -384,3 +382,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
