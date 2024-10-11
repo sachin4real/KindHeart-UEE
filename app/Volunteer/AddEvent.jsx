@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
+
 export default function AddEvent() {
   const [name, setName] = useState('');
   const [imgUrl, setImgUrl] = useState('');
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   button: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#738FFE',
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 8,
