@@ -2,10 +2,9 @@ import { View, FlatList, StyleSheet, Dimensions } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { collection, getDocs, query } from 'firebase/firestore';
 import { db } from '../../configs/FirebaseConfig';
-import CategoryItem from '../CategoryItem'
+import CategoryItem from '../CategoryItem';
 import { useRouter } from 'expo-router';
 
-// Get device width
 const windowWidth = Dimensions.get('window').width;
 
 export default function Category({ onCategorySelect }) {
@@ -16,6 +15,7 @@ export default function Category({ onCategorySelect }) {
     GetCategoryList();
   }, []);
 
+  // Fetching the category list from Firestore
   const GetCategoryList = async () => {
     const q = query(collection(db, 'Category'));
     const querySnapshot = await getDocs(q);
@@ -25,7 +25,7 @@ export default function Category({ onCategorySelect }) {
       fetchedCategories.push(doc.data());
     });
 
-    // Ensure 'All' comes first
+    // Sort categories with 'All' appearing first
     const sortedCategories = fetchedCategories.sort((a, b) =>
       a.name === 'All' ? -1 : b.name === 'All' ? 1 : 0
     );
@@ -33,15 +33,20 @@ export default function Category({ onCategorySelect }) {
     setCategoryList(sortedCategories);
   };
 
+  // Handling the category press based on the category name
   const handleCategoryPress = (category) => {
-    if (category.name === 'Volunteer') {
+    if (category.name === 'Education') {
       // Navigate to the education page
+      router.push('/Education/EducationPage');
+    } else if (category.name === 'Volunteer') {
+      // Navigate to the volunteer page
       router.push('/Volunteer/EventList');
     } else {
       onCategorySelect(category);
     }
   };
-  
+
+  // Rendering each category item
   const renderCategoryItem = ({ item }) => (
     <CategoryItem category={item} onCategoryPress={handleCategoryPress} />
   );
@@ -57,7 +62,7 @@ export default function Category({ onCategorySelect }) {
         contentContainerStyle={styles.flatListContainer}
         snapToAlignment="start"
         decelerationRate="fast"
-        snapToInterval={windowWidth / 4} // Ensures scrolling fits 4 categories
+        snapToInterval={windowWidth / 4}
       />
     </View>
   );
