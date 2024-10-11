@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   progressBarContainer: {
-    margintop:80,
+    marginTop: 150, // Adjusted margin to create space between back button and progress bar
     height: 10,
     backgroundColor: '#e0e0e0',
     borderRadius: 5,
