@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#007AFF', // Bright blue box for emphasis
     padding: 30, // Increased padding for larger box
     borderRadius: 12,
-    marginBottom: 70,
+    marginBottom: 60,
     alignItems: 'center',
     height: 170,
   },
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '500',
     color: '#333',
-    marginBottom: 15,
+    marginBottom: 20,
     textAlign: 'center',
   },
   buttonContainer: {

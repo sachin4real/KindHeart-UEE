@@ -3,8 +3,10 @@ import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Modal, A
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { db } from '../../configs/FirebaseConfig';
 import { collection, addDoc, onSnapshot, orderBy, query, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { useUser } from '@clerk/clerk-expo'; // Assuming you're using Clerk for authentication
 
 export default function CommunityPage() {
+  const { user } = useUser(); // Get the current user's information
   const [messages, setMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -13,7 +15,7 @@ export default function CommunityPage() {
   useEffect(() => {
     const messagesRef = collection(db, 'CommunityMessages');
     const q = query(messagesRef, orderBy('timestamp', 'desc'));
-    
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const messagesData = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -41,10 +43,11 @@ export default function CommunityPage() {
         // Add new message
         const messagesRef = collection(db, 'CommunityMessages');
         await addDoc(messagesRef, {
-          userName: 'John Doe', // Replace with actual user name
-          avatarUrl: 'https://via.placeholder.com/40', // Replace with actual user avatar
+          userName: user.fullName || 'Anonymous', // Replace with actual user name
+          avatarUrl: user.profileImageUrl || 'https://via.placeholder.com/40', // Replace with actual user avatar
           content: currentMessage,
           timestamp: new Date(),
+          userId: user.id, // Store the user ID for later reference
         });
       }
 
@@ -58,6 +61,10 @@ export default function CommunityPage() {
   };
 
   const handleEditMessage = (message) => {
+    if (message.userId !== user.id) {
+      Alert.alert('Error', 'You can only edit your own messages.');
+      return;
+    }
     setCurrentMessage(message.content);
     setEditingMessage(message);
     setShowModal(true);
@@ -81,12 +88,16 @@ export default function CommunityPage() {
         <Text style={styles.timeText}>{new Date(item.timestamp.seconds * 1000).toLocaleTimeString()}</Text>
         <Text style={styles.messageText}>{item.content}</Text>
         <View style={styles.actionContainer}>
-          <TouchableOpacity onPress={() => handleEditMessage(item)} style={styles.actionButton}>
-            <FontAwesome name="edit" size={16} color="#007AFF" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDeleteMessage(item.id)} style={styles.actionButton}>
-            <FontAwesome name="trash" size={16} color="#FF3B30" />
-          </TouchableOpacity>
+          {item.userId === user.id && ( // Show edit and delete buttons only for the message owner
+            <>
+              <TouchableOpacity onPress={() => handleEditMessage(item)} style={styles.actionButton}>
+                <FontAwesome name="edit" size={16} color="#007AFF" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleDeleteMessage(item.id)} style={styles.actionButton}>
+                <FontAwesome name="trash" size={16} color="#FF3B30" />
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </View>
     </View>
@@ -94,7 +105,7 @@ export default function CommunityPage() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Hello John!</Text>
+      <Text style={styles.title}>Hello {user.fullName || 'User'}!</Text>
       <Text style={styles.subtitle}>Wellness Hub</Text>
 
       <FlatList
@@ -135,7 +146,7 @@ export default function CommunityPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width : "100",
+    width: "100%",
     backgroundColor: '#f8fafc',
     paddingTop: 50,
   },
