@@ -15,7 +15,7 @@ import {
   Keyboard,
 } from 'react-native';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
-import { db } from '../../configs/FirebaseConfig';
+import { db } from '../configs/FirebaseConfig';
 import {
   collection,
   addDoc,
@@ -27,6 +27,8 @@ import {
   deleteDoc,
 } from 'firebase/firestore';
 import { useUser } from '@clerk/clerk-expo'; // Assuming you're using Clerk for authentication
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function CommunityPage() {
   const { user } = useUser(); // Get the current user's information
@@ -34,6 +36,7 @@ export default function CommunityPage() {
   const [currentMessage, setCurrentMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingMessage, setEditingMessage] = useState(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const messagesRef = collection(db, 'CommunityMessages');
@@ -139,6 +142,11 @@ export default function CommunityPage() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+         {/* Back Button */}
+         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Ionicons name="arrow-back" size={24} color="#333" />
+      </TouchableOpacity>
+
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <Text style={styles.title}>Hello {user.fullName || 'User'}!</Text>
@@ -329,4 +337,12 @@ const styles = StyleSheet.create({
     color: '#999',
     fontSize: 16,
   },
+  backButton: {
+    position: 'absolute',
+    top: 40,
+    left: 10,
+    padding: 10,
+    zIndex: 10,
+  },
 });
+
