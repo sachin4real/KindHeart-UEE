@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingVi
 import { db } from '../../configs/FirebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 import { useRouter } from 'expo-router';
+import Ionicons from 'react-native-vector-icons/Ionicons';  // Import Ionicons
 
 export default function FundraiseForm() {
   const router = useRouter();
@@ -37,6 +38,11 @@ export default function FundraiseForm() {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
+          {/* Back Button */}
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={30} color="#4E6AFF" />
+          </TouchableOpacity>
+
           <Text style={styles.title}>Create a New Fundraiser</Text>
           
           {/* Decorative Image */}
@@ -104,6 +110,12 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'center',
   },
+  backButton: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    zIndex: 10,
+  },
   title: {
     fontSize: 26,
     fontFamily: 'outfit-bold',
@@ -111,6 +123,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#4A4A4A',
     marginBottom: 20,
+    marginTop: 70, // Ensures there's space for the back button at the top
   },
   decorativeImage: {
     width: '100%',
@@ -120,7 +133,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#738FFE',
+    borderColor: '#4E6AFF',
     backgroundColor: '#FFF',
     padding: 15,
     borderRadius: 10,
@@ -138,7 +151,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   button: {
-    backgroundColor: '#738FFE',
+    backgroundColor: '#4E6AFF',
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',

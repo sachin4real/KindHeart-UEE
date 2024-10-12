@@ -41,9 +41,16 @@ export default function CourseDetailPage() {
   }
 
   const handleEnrollPress = () => {
-    // Implement enrollment logic here
-    Alert.alert("Enrolled", `You have successfully enrolled in ${course.name}!`);
-    // Optionally navigate to another page or perform an action after enrollment
+    // Display an alert indicating successful enrollment
+    Alert.alert("Enrolled", `You have successfully enrolled in ${course.name}!`, [
+      {
+        text: "OK",
+        onPress: () => {
+          // Navigate to the Enroll page
+          router.push('/Courses/Enroll');
+        },
+      },
+    ]);
   };
 
   return (

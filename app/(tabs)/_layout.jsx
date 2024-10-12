@@ -1,4 +1,3 @@
-import { View, Text } from 'react-native'
 import React from 'react'
 import { Tabs } from 'expo-router'
 import Entypo from '@expo/vector-icons/Entypo';
@@ -16,13 +15,7 @@ export default function TabLayout() {
         }}
       />
       
-      <Tabs.Screen 
-        name="profile" 
-        options={{
-          tabBarLabel: 'Profile',
-          tabBarIcon: ({ color }) => <Feather name="user" size={24} color={color} />
-        }}
-      />
+      
 
       <Tabs.Screen 
         name="emergency" 
@@ -40,11 +33,11 @@ export default function TabLayout() {
         }}
       />
 
-      <Tabs.Screen 
-        name="community" 
+<Tabs.Screen 
+        name="profile" 
         options={{
-          tabBarLabel: 'Community Forum',
-          tabBarIcon: ({ color }) => <Feather name="message-square" size={24} color={color} />
+          tabBarLabel: 'Profile',
+          tabBarIcon: ({ color }) => <Feather name="user" size={24} color={color} />
         }}
       />
     </Tabs>

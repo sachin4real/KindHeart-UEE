@@ -134,7 +134,7 @@ export default function PaymentDetails() {
           
           <View style={styles.headerContainer}>
   <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-    <Ionicons name="arrow-back" size={24} color="#738FFE" />
+    <Ionicons name="arrow-back" size={24} color="#4E6AFF" />
   </TouchableOpacity>
   <Text style={styles.amountText}>Total Price</Text>
 </View>
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   amountValue: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#738FFE',
+    color: '#4E6AFF',
     textAlign: 'left',
     marginBottom: 20,
   },
@@ -267,8 +267,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0F0F0',
   },
   selectedOption: {
-    backgroundColor: '#738FFE',
-    borderColor: '#738FFE',
+    backgroundColor: '#4E6AFF',
+    borderColor: '#4E6AFF',
   },
   paymentOptionText: {
     fontSize: 14,
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     width: '48%',
   },
   donateButton: {
-    backgroundColor: '#738FFE',
+    backgroundColor: '#4E6AFF',
     paddingVertical: 15,
     borderRadius: 25,
     alignItems: 'center',

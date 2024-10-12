@@ -41,7 +41,14 @@ export default function Category({ onCategorySelect }) {
     } else if (category.name === 'Volunteer') {
       // Navigate to the volunteer page
       router.push('/Volunteer/EventList');
-    } else {
+    } else if (category.name === 'Request') {
+      // Navigate to the Request page
+      router.push('/Request/RequestPage');
+    } else if (category.name === 'CommunityForum') {
+      // Navigate to the Request page
+      router.push('/CommunityForum');
+    } 
+    else{
       onCategorySelect(category);
     }
   };
