@@ -1,8 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Modal, Alert, Image, Keyboard } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+  Modal,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { db } from '../../configs/FirebaseConfig';
-import { collection, addDoc, onSnapshot, orderBy, query, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import {
+  collection,
+  addDoc,
+  onSnapshot,
+  orderBy,
+  query,
+  doc,
+  updateDoc,
+  deleteDoc,
+} from 'firebase/firestore';
 import { useUser } from '@clerk/clerk-expo'; // Assuming you're using Clerk for authentication
 
 export default function CommunityPage() {
@@ -44,7 +67,7 @@ export default function CommunityPage() {
         const messagesRef = collection(db, 'CommunityMessages');
         await addDoc(messagesRef, {
           userName: user.fullName || 'Anonymous', // Replace with actual user name
-          avatarUrl: user.profileImageUrl || 'https://via.placeholder.com/40', // Replace with actual user avatar
+          avatarUrl: user.imageUrl || 'https://via.placeholder.com/40', // Replace with actual user avatar
           content: currentMessage,
           timestamp: new Date(),
           userId: user.id, // Store the user ID for later reference
@@ -85,15 +108,23 @@ export default function CommunityPage() {
       <Image source={{ uri: item.avatarUrl }} style={styles.avatar} />
       <View style={styles.messageContent}>
         <Text style={styles.userName}>{item.userName}</Text>
-        <Text style={styles.timeText}>{new Date(item.timestamp.seconds * 1000).toLocaleTimeString()}</Text>
+        <Text style={styles.timeText}>
+          {new Date(item.timestamp.seconds * 1000).toLocaleTimeString()}
+        </Text>
         <Text style={styles.messageText}>{item.content}</Text>
         <View style={styles.actionContainer}>
           {item.userId === user.id && ( // Show edit and delete buttons only for the message owner
             <>
-              <TouchableOpacity onPress={() => handleEditMessage(item)} style={styles.actionButton}>
+              <TouchableOpacity
+                onPress={() => handleEditMessage(item)}
+                style={styles.actionButton}
+              >
                 <FontAwesome name="edit" size={16} color="#007AFF" />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDeleteMessage(item.id)} style={styles.actionButton}>
+              <TouchableOpacity
+                onPress={() => handleDeleteMessage(item.id)}
+                style={styles.actionButton}
+              >
                 <FontAwesome name="trash" size={16} color="#FF3B30" />
               </TouchableOpacity>
             </>
@@ -104,49 +135,76 @@ export default function CommunityPage() {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Hello {user.fullName || 'User'}!</Text>
-      <Text style={styles.subtitle}>Wellness Hub</Text>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.container}>
+          <Text style={styles.title}>Hello {user.fullName || 'User'}!</Text>
+          <Text style={styles.subtitle}>Wellness Hub</Text>
 
-      <FlatList
-        data={messages}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.messageList}
-      />
+          <FlatList
+            data={messages}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.messageList}
+          />
 
-      <TouchableOpacity style={styles.fab} onPress={() => setShowModal(true)}>
-        <MaterialIcons name="edit" size={24} color="#fff" />
-      </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.fab}
+            onPress={() => setShowModal(true)}
+          >
+            <MaterialIcons name="edit" size={24} color="#fff" />
+          </TouchableOpacity>
 
-      <Modal visible={showModal} animationType="slide" transparent onRequestClose={() => setShowModal(false)}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{editingMessage ? 'Edit Message' : 'Add a New Message'}</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Type your message here..."
-              value={currentMessage}
-              onChangeText={setCurrentMessage}
-              multiline
-            />
-            <TouchableOpacity style={styles.postButton} onPress={handleAddOrUpdateMessage}>
-              <Text style={styles.postButtonText}>{editingMessage ? 'Update' : 'Post'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.cancelButton} onPress={() => setShowModal(false)}>
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
+          <Modal
+            visible={showModal}
+            animationType="slide"
+            transparent
+            onRequestClose={() => setShowModal(false)}
+          >
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalTitle}>
+                    {editingMessage ? 'Edit Message' : 'Add a New Message'}
+                  </Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Type your message here..."
+                    value={currentMessage}
+                    onChangeText={setCurrentMessage}
+                    multiline
+                  />
+                  <TouchableOpacity
+                    style={styles.postButton}
+                    onPress={handleAddOrUpdateMessage}
+                  >
+                    <Text style={styles.postButtonText}>
+                      {editingMessage ? 'Update' : 'Post'}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={() => setShowModal(false)}
+                  >
+                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
         </View>
-      </Modal>
-    </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width: "100%",
+    width: '100%',
     backgroundColor: '#f8fafc',
     paddingTop: 50,
   },
