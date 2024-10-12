@@ -57,7 +57,7 @@ function AdminRedirect() {
 
   useEffect(() => {
     if (user) {
-      const adminEmail = "it22312358@my.sliit.lk"; // Replace with your admin email address
+      const adminEmail = "it22000880@my.sliit.lk"; // Replace with your admin email address
       if (user.primaryEmailAddress?.emailAddress === adminEmail) {
         // Redirect to admin dashboard if email matches
         setTimeout(() => {
