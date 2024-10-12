@@ -16,13 +16,7 @@ export default function TabLayout() {
         }}
       />
       
-      <Tabs.Screen 
-        name="profile" 
-        options={{
-          tabBarLabel: 'Profile',
-          tabBarIcon: ({ color }) => <Feather name="user" size={24} color={color} />
-        }}
-      />
+      
 
       <Tabs.Screen 
         name="emergency" 
@@ -45,6 +39,14 @@ export default function TabLayout() {
         options={{
           tabBarLabel: 'Community Forum',
           tabBarIcon: ({ color }) => <Feather name="message-square" size={24} color={color} />
+        }}
+      />
+
+<Tabs.Screen 
+        name="profile" 
+        options={{
+          tabBarLabel: 'Profile',
+          tabBarIcon: ({ color }) => <Feather name="user" size={24} color={color} />
         }}
       />
     </Tabs>

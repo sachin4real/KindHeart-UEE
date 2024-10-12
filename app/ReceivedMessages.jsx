@@ -80,7 +80,7 @@ export default function ReceivedMessages({ onBack }) {
       <ScrollView style={styles.scrollView}>
         {messages.map((message) => (
           <View key={message.id} style={styles.card}>
-            <TouchableOpacity onPress={() => handleMessagePress(message)}>
+            <TouchableOpacity onPress={() => handleMessagePress(message)} style={styles.cardTouchable}>
               <Text style={styles.cardTitle}>{message.subject}</Text>
               <Text style={styles.messageText}>From: {message.name}</Text>
               <Text style={styles.timestampText}>Received: {new Date(message.timestamp?.seconds * 1000).toLocaleString()}</Text>
@@ -169,6 +169,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  cardTouchable: {
+    flex: 1,
+  },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -250,4 +253,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
