@@ -41,7 +41,11 @@ export default function Category({ onCategorySelect }) {
     } else if (category.name === 'Volunteer') {
       // Navigate to the volunteer page
       router.push('/Volunteer/EventList');
-    } else {
+    } else if (category.name === 'Request') {
+      // Navigate to the Request page
+      router.push('/Request/RequestPage');
+    }
+    else{
       onCategorySelect(category);
     }
   };

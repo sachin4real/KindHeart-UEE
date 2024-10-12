@@ -7,6 +7,7 @@ import { db } from '../configs/FirebaseConfig';
 import { useUser, useAuth } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
 import ReceivedMessages from './ReceivedMessages';
+import AdminRequestHelpPage from './AdminRequestHelpPage'; // Import the Request Help Page
 import { useRouter } from 'expo-router';
 
 export default function AdminDashboard() {
@@ -50,6 +51,10 @@ export default function AdminDashboard() {
   const renderContent = () => {
     if (currentView === 'receivedMessages') {
       return <ReceivedMessages onBack={() => setCurrentView('dashboard')} />;
+    }
+
+    if (currentView === 'requestHelp') {
+      return <AdminRequestHelpPage />;
     }
 
     return (
@@ -116,6 +121,9 @@ export default function AdminDashboard() {
             </TouchableOpacity>
             <TouchableOpacity style={styles.navItem} onPress={() => setCurrentView('receivedMessages')}>
               <Text style={styles.navText}>Received Messages</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.navItem} onPress={() => setCurrentView('requestHelp')}>
+              <Text style={styles.navText}>Request Help</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={() => setShowNav(false)}>
               <Text style={styles.closeButtonText}>Close</Text>
