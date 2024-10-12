@@ -1,16 +1,16 @@
-// app/Courses/ExternalCoursesPage.jsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../configs/FirebaseConfig';
 import CourseCard from './CourseDetails';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; // Ensure Ionicons is imported
+import { useRouter } from 'expo-router';
 
 const ExternalCoursesPage = () => {
   const navigation = useNavigation();
   const [courses, setCourses] = useState([]);
-
+  const router = useRouter();
   useEffect(() => {
     fetchCourses();
   }, []);
@@ -39,28 +39,28 @@ const ExternalCoursesPage = () => {
 
   return (
     <View style={styles.container}>
-      {/* Title with increased top space */}
+      {/* Back Button at the Top */}
+      <TouchableOpacity style={styles.backButton} onPress={() => router.push('/Education/EducationPage')}>
+        <Ionicons name="arrow-back" size={24} color="white" />
+      </TouchableOpacity>
+
+      {/* Title */}
       <Text style={styles.title}>External Courses</Text>
 
+      {/* Banner */}
       <View style={styles.banner}>
         <Text style={styles.bannerText}>Learning is the best thing</Text>
       </View>
-      
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <FlatList
-          data={courses}
-          renderItem={renderCourse}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          style={styles.list}
-        />
-      </ScrollView>
 
-      {/* Back Button at the Bottom */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Ionicons name="arrow-back" size={24} color="#000" />
-        <Text style={styles.backButtonText}>Back</Text>
-      </TouchableOpacity>
+      {/* FlatList (no ScrollView wrapping it) */}
+      <FlatList
+        data={courses}
+        renderItem={renderCourse}
+        keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        style={styles.list}
+        contentContainerStyle={styles.listContainer} // Added padding for the list
+      />
     </View>
   );
 };
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#007AFF',
     borderRadius: 15,
     padding: 30,
-    marginTop:20,
+    marginTop: 20,
     marginBottom: 25,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
@@ -97,25 +97,23 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '600',
   },
-  scrollContainer: {
-    paddingBottom: 20,
-  },
   list: {
     flexGrow: 1,
+  },
+  listContainer: {
+    paddingBottom: 20, // Added padding to the bottom of the list
   },
   courseCard: {
     marginBottom: 15,
   },
   backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 20, // Space above and below the button
-  },
-  backButtonText: {
-    marginLeft: 5,
-    fontSize: 16,
-    color: '#007AFF', // Color for the back button text
+    position: 'absolute',
+    top: 40, // Adjusted to fit the layout
+    left: 20,
+    backgroundColor: '#2196F3',
+    padding: 10, // Adjust padding to balance icon size and button appearance
+    borderRadius: 30, // Set to 50 to make it round
+    zIndex: 10, // Ensure it stays on top
   },
 });
 
