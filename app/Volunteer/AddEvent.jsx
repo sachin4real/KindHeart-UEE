@@ -6,7 +6,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-
 export default function AddEvent() {
   const [name, setName] = useState('');
   const [imgUrl, setImgUrl] = useState('');
@@ -36,8 +35,8 @@ export default function AddEvent() {
         img: imgUrl,
         description,
         location,
-        startSchedule,
-        endSchedule,
+        startSchedule: startSchedule.toDateString(), // Save date only
+        endSchedule: endSchedule.toDateString(),     // Save date only
         capacity: parseInt(capacity, 10),
         availableSeats: parseInt(availableSeats, 10),
       });
@@ -105,37 +104,37 @@ export default function AddEvent() {
           onChangeText={setLocation}
         />
 
-        {/* Start Schedule Date and Time */}
+        {/* Start Schedule Date */}
         <Text style={styles.label}>Start Schedule</Text>
         <TouchableOpacity onPress={() => setShowStartPicker(true)}>
           <TextInput
             style={styles.input}
-            value={startSchedule.toLocaleString()}
+            value={startSchedule.toDateString()} // Display only date
             editable={false}
           />
         </TouchableOpacity>
         {showStartPicker && (
           <DateTimePicker
             value={startSchedule}
-            mode="datetime"
+            mode="date" // Set to date only
             display="default"
             onChange={handleStartDateChange}
           />
         )}
 
-        {/* End Schedule Date and Time */}
+        {/* End Schedule Date */}
         <Text style={styles.label}>End Schedule</Text>
         <TouchableOpacity onPress={() => setShowEndPicker(true)}>
           <TextInput
             style={styles.input}
-            value={endSchedule.toLocaleString()}
+            value={endSchedule.toDateString()} // Display only date
             editable={false}
           />
         </TouchableOpacity>
         {showEndPicker && (
           <DateTimePicker
             value={endSchedule}
-            mode="datetime"
+            mode="date" // Set to date only
             display="default"
             onChange={handleEndDateChange}
           />
@@ -173,7 +172,7 @@ export default function AddEvent() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop:30,
+    paddingTop: 30,
     flex: 1,
     backgroundColor: '#f3f4f6',
   },
