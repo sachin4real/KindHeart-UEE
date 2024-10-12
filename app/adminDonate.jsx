@@ -2,12 +2,13 @@
 
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Image, Modal } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, doc } from 'firebase/firestore';
 import { db } from '../configs/FirebaseConfig';
 import { useUser, useAuth } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
 import ReceivedMessages from './ReceivedMessages';
 import AdminRequestHelpPage from './AdminRequestHelpPage'; // Import the Request Help Page
+import { useRouter } from 'expo-router';
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -16,6 +17,7 @@ export default function AdminDashboard() {
   const [donatorsCount, setDonatorsCount] = useState(0);
   const { user } = useUser();
   const { signOut } = useAuth();
+  const router = useRouter();
 
   // State for side navigation and current view
   const [showNav, setShowNav] = useState(false);
@@ -39,31 +41,6 @@ export default function AdminDashboard() {
     };
     fetchFirestoreData();
   }, []);
-
-  const handleDeleteProgram = async (programId) => {
-    try {
-      await deleteDoc(doc(db, 'ProgramList', programId));
-      setPrograms(programs.filter(program => program.id !== programId));
-      setActiveProgramsCount(activeProgramsCount - 1);
-      Alert.alert('Success', 'Program deleted successfully!');
-    } catch (error) {
-      console.error('Error deleting program: ', error);
-      Alert.alert('Error', 'Failed to delete the program.');
-    }
-  };
-
-  const handleUpdateProgram = async (programId) => {
-    try {
-      await updateDoc(doc(db, 'ProgramList', programId), {
-        name: 'Updated Program Name'
-      });
-      setPrograms(programs.map(program => program.id === programId ? { ...program, name: 'Updated Program Name' } : program));
-      Alert.alert('Success', 'Program updated successfully!');
-    } catch (error) {
-      console.error('Error updating program: ', error);
-      Alert.alert('Error', 'Failed to update the program.');
-    }
-  };
 
   const handleLogout = async () => {
     await signOut();
@@ -104,12 +81,10 @@ export default function AdminDashboard() {
               <Text>Donated Amount: Rs{program.donatedAmount.toLocaleString()}</Text>
               <Text>Goal Amount: Rs{program.goalAmount.toLocaleString()}</Text>
               <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteProgram(program.id)}>
-                  <Text style={styles.buttonText}>Delete</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.updateButton} onPress={() => handleUpdateProgram(program.id)}>
-                  <Text style={styles.buttonText}>Update</Text>
-                </TouchableOpacity>
+              <TouchableOpacity style={styles.viewButton} onPress={() => router.push(`/adminPrograms/${program.id}`)}>
+  <Text style={styles.buttonText}>View</Text>
+</TouchableOpacity>
+
               </View>
             </View>
           ))}
@@ -159,8 +134,6 @@ export default function AdminDashboard() {
     </View>
   );
 }
-
-
 
 const styles = StyleSheet.create({
   container: {
@@ -251,16 +224,10 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     marginTop: 15,
   },
-  deleteButton: {
-    backgroundColor: '#eb3b5a',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
-  updateButton: {
+  viewButton: {
     backgroundColor: '#4b7bec',
     paddingVertical: 10,
     paddingHorizontal: 20,

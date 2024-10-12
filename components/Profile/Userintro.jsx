@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 4,
-    borderColor: '#738FFE',
+    borderColor: '#4E6AFF',
     marginBottom: 20,
   },
   achievementContainer: {
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   },
   donationsText: {
     fontSize: 18,
-    color: '#738FFE',
+    color: '#4E6AFF',
     marginTop: 10,
   },
   highlight: {
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#738FFE',
+    backgroundColor: '#4E6AFF',
     borderRadius: 5,
   },
   programsText: {
@@ -282,18 +282,18 @@ const styles = StyleSheet.create({
   },
   fallbackText: {
     fontSize: 16,
-    color: '#738FFE',
+    color: '#4E6AFF',
     marginBottom: 10,
   },
   fundraiseButton: {
-    backgroundColor: '#738FFE',
+    backgroundColor: '#4E6AFF',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
     marginVertical: 20,
   },
   MyVolunteer: {
-    backgroundColor: '#738FFE',
+    backgroundColor: '#4E6AFF',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',

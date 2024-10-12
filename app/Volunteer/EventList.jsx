@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   activeButton: {
-    backgroundColor: '#738FFE',
+    backgroundColor: '#4E6AFF',
   },
   buttonText: {
     color: '#fff',
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 50,
     right: 20,
-    backgroundColor: '#738FFE',
+    backgroundColor: '#4E6AFF',
     width: 60,
     height: 60,
     borderRadius: 30,
