@@ -5,11 +5,12 @@ import { db } from '../../configs/FirebaseConfig';
 import CourseCard from './CourseDetails';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; // Ensure Ionicons is imported
+import { useRouter } from 'expo-router';
 
 const ExternalCoursesPage = () => {
   const navigation = useNavigation();
   const [courses, setCourses] = useState([]);
-
+  const router = useRouter();
   useEffect(() => {
     fetchCourses();
   }, []);
@@ -39,7 +40,7 @@ const ExternalCoursesPage = () => {
   return (
     <View style={styles.container}>
       {/* Back Button at the Top */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.push('/Education/EducationPage')}>
         <Ionicons name="arrow-back" size={24} color="white" />
       </TouchableOpacity>
 

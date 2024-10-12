@@ -5,6 +5,7 @@ import { db } from '../../configs/FirebaseConfig';
 import { useUser } from '@clerk/clerk-expo';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; // Import Ionicons
+import { useRouter } from 'expo-router';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -13,6 +14,7 @@ export default function EducationPage() {
   const [loading, setLoading] = useState(true);
   const { user } = useUser(); // Access user data here
   const navigation = useNavigation();
+  const router = useRouter();
 
   useEffect(() => {
     fetchCourses();
@@ -74,7 +76,7 @@ export default function EducationPage() {
   return (
     <View style={styles.container}>
       {/* Custom Round Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.push('/home')}>
         <Ionicons name="arrow-back" size={24} color="white" />
       </TouchableOpacity>
 
