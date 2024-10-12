@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, Alert, TouchableOpacity, Button, StyleSheet, ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { db } from '../../configs/FirebaseConfig';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -12,17 +12,15 @@ export default function AddEvent() {
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [startSchedule, setStartSchedule] = useState(new Date());
-  const [endSchedule, setEndSchedule] = useState(new Date());
   const [capacity, setCapacity] = useState('');
   const [availableSeats, setAvailableSeats] = useState('');
   const [loading, setLoading] = useState(false);
   const [showStartPicker, setShowStartPicker] = useState(false);
-  const [showEndPicker, setShowEndPicker] = useState(false);
 
   const navigation = useNavigation();
 
   const handleAddEvent = async () => {
-    if (!name || !imgUrl || !description || !location || !startSchedule || !endSchedule || !capacity || !availableSeats) {
+    if (!name || !imgUrl || !description || !location || !startSchedule || !capacity || !availableSeats) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
@@ -35,8 +33,7 @@ export default function AddEvent() {
         img: imgUrl,
         description,
         location,
-        startSchedule: startSchedule.toDateString(), // Save date only
-        endSchedule: endSchedule.toDateString(),     // Save date only
+        startSchedule: Timestamp.fromDate(startSchedule), // Store as Firestore Timestamp
         capacity: parseInt(capacity, 10),
         availableSeats: parseInt(availableSeats, 10),
       });
@@ -54,12 +51,6 @@ export default function AddEvent() {
     const currentDate = selectedDate || startSchedule;
     setShowStartPicker(false);
     setStartSchedule(currentDate);
-  };
-
-  const handleEndDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || endSchedule;
-    setShowEndPicker(false);
-    setEndSchedule(currentDate);
   };
 
   return (
@@ -106,37 +97,18 @@ export default function AddEvent() {
 
         {/* Start Schedule Date */}
         <Text style={styles.label}>Start Schedule</Text>
-        <TouchableOpacity onPress={() => setShowStartPicker(true)}>
-          <TextInput
-            style={styles.input}
-            value={startSchedule.toDateString()} // Display only date
-            editable={false}
-          />
-        </TouchableOpacity>
+        <TextInput
+          style={styles.input}
+          value={startSchedule.toDateString()} // Display only date
+          editable={false}
+        />
+        <Button title="Set Start Date" onPress={() => setShowStartPicker(true)} />
         {showStartPicker && (
           <DateTimePicker
             value={startSchedule}
             mode="date" // Set to date only
             display="default"
             onChange={handleStartDateChange}
-          />
-        )}
-
-        {/* End Schedule Date */}
-        <Text style={styles.label}>End Schedule</Text>
-        <TouchableOpacity onPress={() => setShowEndPicker(true)}>
-          <TextInput
-            style={styles.input}
-            value={endSchedule.toDateString()} // Display only date
-            editable={false}
-          />
-        </TouchableOpacity>
-        {showEndPicker && (
-          <DateTimePicker
-            value={endSchedule}
-            mode="date" // Set to date only
-            display="default"
-            onChange={handleEndDateChange}
           />
         )}
 
@@ -179,7 +151,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     alignItems: 'center',
     padding: 16,
-    paddingBottom: 60,  // Ensure extra padding at the bottom
+    paddingBottom: 60,
   },
   title: {
     fontSize: 28,
@@ -204,7 +176,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
-    marginBottom: 20,
+    marginBottom: 10, // Reduced bottom margin here
     backgroundColor: '#fff',
     color: '#333',
   },
