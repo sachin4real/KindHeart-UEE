@@ -30,7 +30,7 @@ export default function Enroll() {
           style={styles.homeButton}
           onPress={() => router.push('/Courses/CourseDetailPage')} // Navigate back to the home page
         >
-          <Text style={styles.homeButtonText}>Back to Volunteering List</Text>
+          <Text style={styles.homeButtonText}>Back to  CourseDetailPage</Text>
         </TouchableOpacity>
       </Animatable.View>
     </View>
