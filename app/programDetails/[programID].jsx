@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#738FFE',
+    backgroundColor: '#4E6AFF',
     borderRadius: 5,
   },
   aboutHeader: {
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   helpNowButton: {
-    backgroundColor: '#738FFE',
+    backgroundColor: '#4E6AFF',
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',
