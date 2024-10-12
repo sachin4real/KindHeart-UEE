@@ -28,7 +28,7 @@ export default function Enroll() {
       <Animatable.View animation="fadeInUp" delay={1000}>
         <TouchableOpacity
           style={styles.homeButton}
-          onPress={() => router.push('/Courses/CourseDetailPage')} // Navigate back to the home page
+          onPress={() => router.push('/Courses/ExternalCoursesPage')} // Navigate back to the home page
         >
           <Text style={styles.homeButtonText}>Back to  CourseDetailPage</Text>
         </TouchableOpacity>
