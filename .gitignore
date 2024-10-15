@@ -18,3 +18,9 @@ web-build/
 
 expo-env.d.ts
 # @end expo-cli
+
+# Ignore environment variable files
+.env
+.env.*
+/configs/FirebaseConfig.js
+.env

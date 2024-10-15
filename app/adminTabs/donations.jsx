@@ -1,8 +1,8 @@
 import { View, Text } from 'react-native'
 import React from 'react'
-import Userintro from '../../components/Profile/Userintro'
+import AdminDashboard from '../adminDonate'
 
-export default function profile() {
+export default function donations() {
   return (
 
     <View style={{
@@ -10,7 +10,7 @@ export default function profile() {
     }}>
       
 
-      <Userintro/>
+      <AdminDashboard/>
 
     </View>
   )
