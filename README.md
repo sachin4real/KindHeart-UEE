@@ -18,8 +18,10 @@
 - **Community Forum**: Connect with other volunteers and donors for a supportive community experience.
 
 ## Screenshots
-![Home-Donation](https://github.com/sachin4real/KindHeart-UEE/blob/sachintha/assets/IMG/Donation.jpg?raw=true)
-![Volunteer](https://github.com/sachin4real/KindHeart-UEE/blob/sachintha/assets/IMG/Volunteer.jpg?raw=true)
+<div align="center">
+  <img src="https://github.com/sachin4real/KindHeart-UEE/blob/sachintha/assets/IMG/Donation.jpg?raw=true" alt="Home-Donation" width="35%" />
+  <img src="https://github.com/sachin4real/KindHeart-UEE/blob/sachintha/assets/IMG/Volunteer.jpg?raw=true" alt="Volunteer" width="35%" />
+</div>
 
 
 
